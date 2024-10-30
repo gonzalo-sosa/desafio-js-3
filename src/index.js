@@ -6,7 +6,7 @@ import { TaskElement } from "./components/TaskElement"; // importar si o si
 
 const task1 = new Task("Tarea 1", "Esta es mi primer tarea", "10/10/2024");
 const task2 = new Task("Tarea 2", "Esta es mi segunda tarea", "10/10/2024");
-const task3 = new Task("Tarea 3", "Esta es mi segunda tarea", "10/10/2024");
+const task3 = new Task("Tarea 3", "Esta es mi tercera tarea", "10/10/2024");
 
 var activeTaskList = new TaskList();
 var completedTaskList = new TaskList();

@@ -19,6 +19,7 @@ export class TaskElement extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         .task {
+          position: relative;
           display: grid;
           grid-template-columns: 10% 20% 30% 20% 20%;
           align-content: center;
@@ -46,8 +47,31 @@ export class TaskElement extends HTMLElement {
         .state-list{
           margin: 0;
           padding: 0;
-          list-style-type: none;
         }
+
+        :popover-open{
+          width: fit-content;
+          height: fit-content;
+          position: absolute;
+          top: 0;
+        }
+        
+        :popover-open button{
+          width: 100%;
+          outline: 0;
+          border: none;
+          background-color: transparent;
+          text-align: start;
+        }
+        
+        :popover-open button::before{
+          content: "•";
+          font-size: 2.5em;
+          vertical-align: middle;
+          display: inline-block;
+          margin-right: .5rem;
+        }
+
       </style>
       <article class="task">
         <button class="task__btn"></button>
@@ -60,12 +84,13 @@ export class TaskElement extends HTMLElement {
 
   // se invoca cuando se añade el elemento al dom
   connectedCallback() {
+    this.task = this.shadowRoot.querySelector("article");
+
     this.btn = this.shadowRoot.querySelector("button");
     this.updateBtn();
 
     const $div = document.createElement("div");
     $div.setAttribute("popover", "");
-    $div.classList.add("popup");
 
     const $list = document.createElement("ul");
     $list.classList.add("state-list");
@@ -75,6 +100,7 @@ export class TaskElement extends HTMLElement {
       const $btn = document.createElement("button");
 
       $btn.textContent = TASK_STATES[state];
+
       $btn.addEventListener("click", () => {
         this.updateState(TASK_STATES[state]);
       });
@@ -87,10 +113,10 @@ export class TaskElement extends HTMLElement {
 
     this.shadowRoot.appendChild($div);
 
-    this.div = $div;
+    this.task.appendChild($div);
 
     this.btn.addEventListener("click", () => {
-      this.div.showPopover();
+      this.task.querySelector("div").showPopover();
     });
   }
 

@@ -13,4 +13,5 @@ grid-template-columns: repeat(auto-fit, minmax(min-content, 300px));
 
 .task-container {
   width: 100%;
+  position: relative;
 }
