@@ -1,4 +1,5 @@
 import { TASK_STATES } from "./Task";
+import { PopoverElement } from "../Popover/PopoverElement";
 
 const TASK_STATES_COLOR = {
   NEW: "#656F7D",
