@@ -11,7 +11,7 @@ export class StateIconElement extends HTMLElement {
     this.color = this.getAttribute("color") ?? STATES_COLOR.NEW;
 
     this.attachShadow({ mode: "open" });
-    this.shadowRoot.innerHTML = `<span style="vertical-align: middle; display: inline-block; width: 15px; height: 15px; border-radius: 100%; background-color: ${this.color};"></span>`;
+    this.shadowRoot.innerHTML = `<span style="vertical-align: middle; display: inline-block; width: 1rem; height: 1rem; border-radius: 100%; background-color: ${this.color};"></span>`;
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
