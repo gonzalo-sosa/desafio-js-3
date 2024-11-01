@@ -7,29 +7,94 @@ const task2 = new Task("Tarea 2", "Esta es mi segunda tarea", "10/10/2024");
 const task3 = new Task("Tarea 3", "Esta es mi tercera tarea", "10/10/2024");
 const task4 = new Task("Tarea 4", "Esta es mi cuarta tarea", "10/10/2024");
 
-var activeTaskList = new TaskList();
-var completedTaskList = new TaskList();
+// TODO: agregar ícono para borrar tarea
 
-activeTaskList.addTask(task1);
-activeTaskList.addTask(task2);
-activeTaskList.addTask(task3);
-activeTaskList.addTask(task4);
+var activeTaskList = new TaskList(
+  JSON.parse(localStorage.getItem("tasks-active") || "[]")
+);
 
-const $taskList = document.getElementsByClassName("task-list")[0];
+var completedTaskList = new TaskList(
+  JSON.parse(localStorage.getItem("tasks-completed") || "[]")
+);
+
+// activeTaskList.addTask(task1);
+// activeTaskList.addTask(task2);
+// activeTaskList.addTask(task3);
+
+//completedTaskList.addTask(task4);
+
+localStorage.setItem("tasks-active", activeTaskList.toString());
+localStorage.setItem("tasks-completed", completedTaskList.toString());
+
+// localStorage.clear(); // para evitar que se llene de tareas mientras se desarrolla la app
+
+const $taskListNew = document.getElementById("tasksNew");
+const $taskListCompleted = document.getElementById("tasksCompleted");
 
 for (const task of activeTaskList.list) {
-  const { title, description, dueDate, state, location } = task;
+  addTaskElementToListElement(task, $taskListNew);
+}
 
-  $taskList.insertAdjacentHTML(
+for (const task of completedTaskList.list) {
+  addTaskElementToListElement(task, $taskListCompleted);
+}
+
+var $addTask = document.getElementById("addTaskBtn");
+var $form = document.getElementById("addTaskForm");
+
+$form.addEventListener("submit", (event) => {
+  const { title, description, dueDate } = getFormData(event);
+  console.log(title, description, dueDate);
+  const task = new Task(title, description, dueDate);
+
+  console.log({ task });
+
+  activeTaskList.addTask(task);
+
+  addTaskElementToListElement(task, $taskListNew);
+
+  localStorage.setItem("tasks-active", activeTaskList.toString());
+
+  $form.classList.remove("active");
+  $addTask.classList.add("active");
+});
+
+$addTask.addEventListener("click", function () {
+  $form.classList.add("active");
+  $addTask.classList.remove("active");
+});
+
+function addTaskElementToListElement(
+  { title, description, dueDate, state, location },
+  list
+) {
+  list.insertAdjacentHTML(
     "beforeend",
     `<task-element
       class="task-container"
       title="${title}" 
-      due-date="${dueDate.toLocaleDateString()}"
+      due-date="${new Date(dueDate).toLocaleDateString()}"
       state="${state}"
       location="${location}" 
     >
     ${description}
     </task-element>`
   );
+}
+
+function getFormData(event) {
+  event.preventDefault();
+  const $form = event.target;
+
+  const data = new FormData($form);
+
+  const title = data.get("title");
+  const description = data.get("description");
+  const dueDate = data.get("due-date");
+
+  return {
+    title,
+    description,
+    dueDate,
+  };
 }
