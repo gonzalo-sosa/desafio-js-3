@@ -8,7 +8,8 @@ export class TaskElement extends HTMLElement {
     this.title = this.getAttribute("title");
     this.createdAtDate =
       this.getAttribute("created-at-date") ?? new Date().toLocaleDateString();
-    this.expirationDate = this.getAttribute("expiration-date");
+    this.dueDate = this.getAttribute("due-date");
+    this.location = this.getAttribute("location") ?? "location";
     this.state = this.getAttribute("state") ?? STATES_LABEL.NEW;
     this.btnColor = STATES_COLOR.NEW;
 
@@ -33,8 +34,9 @@ export class TaskElement extends HTMLElement {
         }
 
         .task__title,
-        .task__createdAtDate,
-        .task__expirationDate{
+        .task__dueDate,
+        .task__location
+        {
           text-align: center;
         }
 
@@ -70,8 +72,8 @@ export class TaskElement extends HTMLElement {
         <button class="task__btn"><popover-element></popover-element></button>
         <h4 class="task__title">${this.title}</h4>
         <p class="task__description"><slot></slot></p>
-        <span class="task__createdAtDate">${this.createdAtDate}</span>
-        <span class="task__expirationDate">${this.expirationDate}</span>
+        <span class="task__dueDate">${this.dueDate}</span>
+        <span class="task__location">${this.location}</span>
       </article>`;
 
     this.task = this.shadowRoot.querySelector("article");
