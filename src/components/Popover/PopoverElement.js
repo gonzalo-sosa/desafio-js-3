@@ -18,7 +18,7 @@ export class PopoverElement extends HTMLElement {
           display: block;   
         }
       </style>
-      <div class="popover" open="${this.open}"><slot/></div>
+      <div class="popover"><slot/></div>
     `;
 
     this.div = this.shadowRoot.querySelector("div");
