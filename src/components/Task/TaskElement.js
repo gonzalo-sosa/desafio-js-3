@@ -1,12 +1,6 @@
 import { TASK_STATES } from "./Task";
 import { PopoverElement } from "../Popover/PopoverElement";
 
-const TASK_STATES_COLOR = {
-  NEW: "#656F7D",
-  IN_PROGRESS: "#40A6E6",
-  COMPLETED: "#F9BE33",
-};
-
 export class TaskElement extends HTMLElement {
   constructor() {
     super();
@@ -25,7 +19,7 @@ export class TaskElement extends HTMLElement {
           grid-template-columns: 10% 20% 30% 20% 20%;
           align-content: center;
           align-items: center;
-          gap: .5rem;
+          column-gap: .5rem;
         }
         
         .task__btn {
@@ -48,31 +42,16 @@ export class TaskElement extends HTMLElement {
         .state-list{
           margin: 0;
           padding: 0;
+          list-style-type: none;
         }
 
-        :popover-open{
-          width: fit-content;
-          height: fit-content;
-          position: absolute;
-          top: 0;
-        }
-        
-        :popover-open button{
+        .state-list button{
           width: 100%;
-          outline: 0;
-          border: none;
           background-color: transparent;
+          outline: 0;
+          border: 0;
           text-align: start;
         }
-        
-        :popover-open button::before{
-          content: "•";
-          font-size: 2.5em;
-          vertical-align: middle;
-          display: inline-block;
-          margin-right: .5rem;
-        }
-
       </style>
       <article class="task">
         <button class="task__btn"></button>
@@ -80,6 +59,7 @@ export class TaskElement extends HTMLElement {
         <p class="task__description"><slot></slot></p>
         <span class="task__expirationDate">${this.createdAtDate}</span>
         <span class="task__expirationDate">${this.expirationDate}</span>
+        <popover-element></popover-element>
       </article>`;
   }
 
@@ -90,35 +70,29 @@ export class TaskElement extends HTMLElement {
     this.btn = this.shadowRoot.querySelector("button");
     this.updateBtn();
 
-    const $div = document.createElement("div");
-    $div.setAttribute("popover", "");
-
+    this.popoverElement = this.task.querySelector("popover-element");
     const $list = document.createElement("ul");
-    $list.classList.add("state-list");
 
     for (const state in TASK_STATES) {
       const $listItem = document.createElement("li");
       const $btn = document.createElement("button");
 
       $btn.textContent = TASK_STATES[state];
-
-      $btn.addEventListener("click", () => {
-        this.updateState(TASK_STATES[state]);
-      });
+      $btn.addEventListener("click", () =>
+        this.updateState(TASK_STATES[state])
+      );
 
       $listItem.appendChild($btn);
 
       $list.appendChild($listItem);
+      $list.classList.add("state-list");
+
+      this.popoverElement.appendChild($list);
     }
-    $div.appendChild($list);
 
-    this.shadowRoot.appendChild($div);
-
-    this.task.appendChild($div);
-
-    this.btn.addEventListener("click", () => {
-      this.task.querySelector("div").showPopover();
-    });
+    this.btn.addEventListener("click", () =>
+      this.popoverElement.togglePopover()
+    );
   }
 
   // se invoca cuando el desconecta del dom

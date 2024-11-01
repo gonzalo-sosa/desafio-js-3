@@ -1,49 +1,36 @@
 export class PopoverElement extends HTMLElement {
   constructor() {
     super();
+    this.open = this.getAttribute("open") ?? false;
+
     this.attachShadow({ mode: "open" });
-
-    this.popover = document.createElement("div");
-    this.popover.classList.add("popover");
-    this.popover.innerText = "Contenido por defecto";
-    this.popover.style.display = "none";
-
-    const style = document.createElement("style");
-
-    style.textContent = `
-      .popover {
+    this.shadowRoot.innerHTML = `
+      <style>
+        .popover{
+          display: none;
           position: absolute;
           background: white;
           border: 1px solid #ccc;
-          padding: 10px;
           display: none;
           z-index: 1000;
-      }
+        }
+        .popover--open{
+          display: block;   
+        }
+      </style>
+      <div class="popover" open="${this.open}"><slot/></div>
     `;
 
-    this.shadowRoot.append(style, this.popover);
-
-    this.addEventListener("click", () => this.togglePopover());
+    this.div = this.shadowRoot.querySelector("div");
   }
 
   togglePopover() {
-    const isVisible = this.popover.style.display === "block";
-    this.popover.style.display = isVisible ? "none" : "block";
+    this.open = !this.open;
+    this.setAttribute("open", this.open);
+    this.div.classList.toggle("popover--open");
   }
 
-  connectedCallback() {
-    this.shadowRoot.appendChild(this.popover);
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "text") {
-      this.popover.innerText = newValue;
-    }
-  }
-
-  static get observedAttributes() {
-    return ["text"];
-  }
+  //connectedCallback() {}
 }
 
 customElements.define("popover-element", PopoverElement);
