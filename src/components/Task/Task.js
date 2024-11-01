@@ -1,8 +1,4 @@
-export const TASK_STATES = {
-  NEW: "Nueva",
-  IN_PROGRESS: "En progreso",
-  COMPLETED: "Completada",
-};
+import { STATES_LABEL } from "../consts";
 
 export class Task {
   constructor(title, description, expirationDate) {
@@ -10,7 +6,7 @@ export class Task {
     this.description = description;
     this.expirationDate = new Date(expirationDate);
     this._id = "UUID";
-    this.state = TASK_STATES.NEW;
+    this.state = STATES_LABEL.NEW;
     this.createdAtDate = new Date();
   }
 }
