@@ -3,19 +3,14 @@ import { PopoverElement } from "../Popover/PopoverElement";
 import { StateIconElement } from "../StateIcon/StateIconElement";
 
 export class TaskElement extends HTMLElement {
-  static get observedAttributes() {
-    return ["state-label", "btn-color"];
-  }
-
   constructor() {
     super();
     this.title = this.getAttribute("title");
     this.createdAtDate =
       this.getAttribute("created-at-date") ?? new Date().toLocaleDateString();
     this.expirationDate = this.getAttribute("expiration-date");
-
-    this.stateLabel = this.getAttribute("state-label") ?? STATES_LABEL.NEW;
-    this.btnColor = this.getAttribute("btn-color") ?? STATES_COLOR.NEW;
+    this.state = this.getAttribute("state") ?? STATES_LABEL.NEW;
+    this.btnColor = STATES_COLOR.NEW;
 
     this.attachShadow({ mode: "open" });
     this.shadowRoot.innerHTML = `
@@ -23,7 +18,7 @@ export class TaskElement extends HTMLElement {
         .task {
           position: relative;
           display: grid;
-          grid-template-columns: 10% 15% 30% 20% 20%;
+          grid-template-columns: 1fr 2fr 3fr 1fr 1fr;
           align-content: center;
           align-items: center;
           column-gap: .5rem;
@@ -37,13 +32,28 @@ export class TaskElement extends HTMLElement {
           padding: .75rem;
         }
 
+        .task__title,
+        .task__createdAtDate,
+        .task__expirationDate{
+          text-align: center;
+        }
+
+        .task__description{
+          margin-inline: .5rem;
+          text-wrap: balance;
+        }
+
         .state-list{
+          display: flex;
+          flex-direction: column;
+          gap: .25rem;
           margin: 0;
           padding: 0;
           list-style-type: none;
         }
 
         .state-list button{
+          font-size: 10px;
           width: 100%;
           background-color: transparent;
           outline: 0;
@@ -52,21 +62,23 @@ export class TaskElement extends HTMLElement {
         }
 
         .state-list button state-icon-element{
-          margin-right: 10px
+          font-size: 10px;
+          margin-right: 10px;
         }
       </style>
       <article class="task">
-        <button class="task__btn"></button>
+        <button class="task__btn"><popover-element></popover-element></button>
         <h4 class="task__title">${this.title}</h4>
         <p class="task__description"><slot></slot></p>
-        <span class="task__expirationDate">${this.createdAtDate}</span>
+        <span class="task__createdAtDate">${this.createdAtDate}</span>
         <span class="task__expirationDate">${this.expirationDate}</span>
-        <popover-element></popover-element>
       </article>`;
 
     this.task = this.shadowRoot.querySelector("article");
     this.btn = this.shadowRoot.querySelector("button");
     this.popoverElement = this.task.querySelector("popover-element");
+
+    this.updateBtn(this.btnColor);
   }
 
   // se invoca cuando se añade el elemento al dom
@@ -98,17 +110,9 @@ export class TaskElement extends HTMLElement {
     );
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "state-label") {
-      this.updateState(newValue);
-    }
-    if (name === "btn-color") {
-      this.updateBtn(newValue);
-    }
-  }
-
   updateState(state) {
     this.state = state;
+    this.setAttribute("state", state);
   }
 
   updateBtn(color) {
