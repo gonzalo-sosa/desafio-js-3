@@ -18,15 +18,16 @@ activeTaskList.addTask(task4);
 const $taskList = document.getElementsByClassName("task-list")[0];
 
 for (const task of activeTaskList.list) {
-  const { title, description, expirationDate, state } = task;
+  const { title, description, dueDate, state, location } = task;
 
   $taskList.insertAdjacentHTML(
     "beforeend",
     `<task-element
       class="task-container"
       title="${title}" 
-      expiration-date="${expirationDate.toLocaleDateString()}"
-      state="${state}" 
+      due-date="${dueDate.toLocaleDateString()}"
+      state="${state}"
+      location="${location}" 
     >
     ${description}
     </task-element>`
