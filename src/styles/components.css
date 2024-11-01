@@ -7,11 +7,51 @@
   position: relative;
 }
 
-.add-task {
+#addTaskBtn {
+  display: none;
+}
+
+#addTaskBtn.active {
+  display: block;
   margin-inline: auto;
   width: fit-content;
   outline: 0;
   border: 0;
   padding: 1rem 2rem;
   border-radius: 1.5rem;
+}
+
+#addTaskForm {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 2fr 3fr 1fr 1fr;
+  align-content: center;
+  align-items: center;
+  column-gap: 0.5rem;
+  text-align: center;
+  padding: 0.5rem;
+  display: none;
+}
+
+#addTaskForm.active {
+  display: grid;
+}
+
+#addTaskForm input {
+  outline: 0;
+  border: 0;
+}
+
+#addTaskForm input[placeholder="Título..."] {
+  text-align: center;
+}
+
+#addTaskForm button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: 0;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 2rem;
 }
