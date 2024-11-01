@@ -5,9 +5,8 @@ import { StateIconElement } from "../StateIcon/StateIconElement";
 export class TaskElement extends HTMLElement {
   constructor() {
     super();
+
     this.title = this.getAttribute("title");
-    this.createdAtDate =
-      this.getAttribute("created-at-date") ?? new Date().toLocaleDateString();
     this.dueDate = this.getAttribute("due-date");
     this.location = this.getAttribute("location") ?? "location";
     this.state = this.getAttribute("state") ?? STATES_LABEL.NEW;
