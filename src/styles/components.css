@@ -1,17 +1,17 @@
 .task-list {
   padding: 1rem;
-  display: grid;
-  gap: 1rem;
-  justify-items: flex-start;
 }
-
-/*
-para mobile
-grid-template-columns: repeat(auto-fit, minmax(min-content, 300px));
-*/
 
 .task-container {
   width: 100%;
   position: relative;
-  padding: 0.5rem;
+}
+
+.add-task {
+  margin-inline: auto;
+  width: fit-content;
+  outline: 0;
+  border: 0;
+  padding: 1rem 2rem;
+  border-radius: 1.5rem;
 }
