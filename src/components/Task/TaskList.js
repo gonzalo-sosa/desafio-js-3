@@ -1,6 +1,6 @@
 export class TaskList {
-  constructor() {
-    this.list = [];
+  constructor(tasks) {
+    this.list = tasks ?? [];
   }
 
   addTask(task) {
@@ -13,5 +13,9 @@ export class TaskList {
     if (index === -1) throw new Error("Tarea inexistente.");
 
     this.list.splice(index, 1);
+  }
+
+  toString() {
+    return JSON.stringify(this.list);
   }
 }
