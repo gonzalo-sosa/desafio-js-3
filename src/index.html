@@ -15,14 +15,21 @@
       <div style="padding: 1rem">
         <form id="addTaskForm">
           <state-icon-element></state-icon-element>
-          <input type="text" id="title" name="title" placeholder="Título..." />
+          <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            placeholder="Título..."
+          />
           <input
             type="text"
             id="description"
             name="description"
+            required
             placeholder="Descripción..."
           />
-          <input type="date" id="due-date" name="due-date" />
+          <input type="date" id="due-date" name="due-date" required />
           <button>
             <svg
               style="vertical-align: middle; display: inline-block"
