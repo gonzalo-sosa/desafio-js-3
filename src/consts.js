@@ -18,3 +18,9 @@ export const STATES_COLOR = {
   IN_PROGRESS: "#40A6E6",
   COMPLETED: "#F9BE33",
 };
+
+export const TASKS = {
+  NEW: "tasks-new",
+  IN_PROGRESS: "tasks-in-progress",
+  COMPLETED: "tasks-completed",
+};
