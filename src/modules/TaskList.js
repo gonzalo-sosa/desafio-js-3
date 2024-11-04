@@ -12,7 +12,7 @@ export class TaskList {
   }
 
   removeTask(toRemove) {
-    const index = this._list.findIndex((task) => task._id == toRemove._id);
+    const index = this._list.findIndex((task) => task.id == toRemove.id);
 
     if (index === -1) throw new Error("Tarea inexistente.");
 
@@ -24,7 +24,7 @@ export class TaskList {
   }
 
   getTaskById(id) {
-    return this._list.find((task) => task._id === id);
+    return this._list.find((task) => task.id === id);
   }
 
   clear() {
