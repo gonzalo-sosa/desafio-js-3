@@ -4,6 +4,7 @@ import { Task, TaskList, LocalStorage } from "./modules/index";
 import { TaskElement } from "./components/index";
 import { STATES, TASKS } from "./consts";
 
+// Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
 const inProgressTaskList = new TaskList(
   LocalStorage.load(TASKS.IN_PROGRESS, "[]")
@@ -12,10 +13,12 @@ const completedTaskList = new TaskList(
   LocalStorage.load(TASKS.COMPLETED, "[]")
 );
 
+// Guardar tareas en local storage
 LocalStorage.save(TASKS.NEW, newTaskList.toString());
 LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
 LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 
+// Obtener listas de tareas (ul)
 const $taskListNew = document.getElementById("tasksNew");
 const $taskListInProgress = document.getElementById("tasksInProgress");
 const $taskListCompleted = document.getElementById("tasksCompleted");
@@ -104,7 +107,7 @@ document.addEventListener("state-changed", (event) => {
     }
   }
 
-  task.state = state;
+  if (task) task.state = state;
 
   if (state === STATES.NEW) {
     newTaskList.addTask(task);
