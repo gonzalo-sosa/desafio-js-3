@@ -2,8 +2,7 @@ import "./styles/main.css";
 
 import { Task, TaskList, LocalStorage } from "./modules/index";
 import { TaskElement } from "./components/index";
-// TODO: agregar al local storage cuando se cambia el estado de una tarea
-// TODO: agregar ícono para borrar tarea
+import { STATES } from "./consts";
 
 const activeTaskList = new TaskList(
   JSON.parse(localStorage.getItem("tasks-active") || "[]")
@@ -68,6 +67,34 @@ function addTaskElementToListElement(
 
   list.insertAdjacentHTML("beforeend", taskElement);
 }
+
+// Evento de cambio de estado de tarea
+document.addEventListener("state-changed", (event) => {
+  const { id, state } = event.detail;
+
+  const task = activeTaskList.getTaskById(id);
+
+  if (task) {
+    task.state = state;
+    LocalStorage.save("tasks-active", activeTaskList);
+  }
+});
+
+// Evento de tarea eliminada
+document.addEventListener("task-deleted", (event) => {
+  const { id } = event.detail;
+
+  const task = activeTaskList.getTaskById(id);
+
+  if (task) {
+    try {
+      activeTaskList.removeTask(task);
+      LocalStorage.save("tasks-active", activeTaskList);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+});
 
 function toggleAddTaskFormVisibility(isVisible) {
   $addTaskForm.classList.toggle("active", isVisible);
