@@ -2,32 +2,41 @@ import "./styles/main.css";
 
 import { Task, TaskList, LocalStorage } from "./modules/index";
 import { TaskElement } from "./components/index";
-import { STATES } from "./consts";
+import { STATES, TASKS } from "./consts";
 
-const activeTaskList = new TaskList(
-  JSON.parse(localStorage.getItem("tasks-active") || "[]")
+const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
+const inProgressTaskList = new TaskList(
+  LocalStorage.load(TASKS.IN_PROGRESS, "[]")
 );
-
 const completedTaskList = new TaskList(
-  JSON.parse(localStorage.getItem("tasks-completed") || "[]")
+  LocalStorage.load(TASKS.COMPLETED, "[]")
 );
 
-LocalStorage.save("tasks-active", activeTaskList.toString());
-LocalStorage.save("tasks-completed", completedTaskList.toString());
+LocalStorage.save(TASKS.NEW, newTaskList.toString());
+LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
+LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 
 const $taskListNew = document.getElementById("tasksNew");
+const $taskListInProgress = document.getElementById("tasksInProgress");
 const $taskListCompleted = document.getElementById("tasksCompleted");
 const $addTask = document.getElementById("addTaskBtn");
 const $addTaskForm = document.getElementById("addTaskForm");
 
 // Cargar tareas
-activeTaskList
-  .getTasks()
-  .forEach((task) => addTaskElementToListElement(task, $taskListNew));
+if (newTaskList.getTasks().length > 0)
+  newTaskList.getTasks().forEach((task) => {
+    addTaskElementToListElement(task, $taskListNew);
+  });
 
-completedTaskList
-  .getTasks()
-  .forEach((task) => addTaskElementToListElement(task, $taskListCompleted));
+if (inProgressTaskList.getTasks().length > 0)
+  inProgressTaskList.getTasks().forEach((task) => {
+    addTaskElementToListElement(task, $taskListInProgress);
+  });
+
+if (completedTaskList.getTasks().length > 0)
+  completedTaskList.getTasks().forEach((task) => {
+    addTaskElementToListElement(task, $taskListCompleted);
+  });
 
 // Manejo del formulario para agregar tareas
 $addTaskForm.addEventListener("submit", (event) => {
@@ -37,11 +46,11 @@ $addTaskForm.addEventListener("submit", (event) => {
 
   const task = new Task(title, description, dueDate);
 
-  activeTaskList.addTask(task);
+  newTaskList.addTask(task);
 
   addTaskElementToListElement(task, $taskListNew);
 
-  LocalStorage.save("tasks-active", activeTaskList.toString());
+  LocalStorage.save(TASKS.NEW, newTaskList.toString());
 
   toggleAddTaskFormVisibility(false);
 });
@@ -50,6 +59,11 @@ $addTask.addEventListener("click", function () {
   toggleAddTaskFormVisibility(true);
 });
 
+/**
+ * @param {Task} obj
+ * @param {TaskList} list
+ *
+ */
 function addTaskElementToListElement(
   { id, title, description, dueDate, state, location },
   list
@@ -71,29 +85,69 @@ function addTaskElementToListElement(
 // Evento de cambio de estado de tarea
 document.addEventListener("state-changed", (event) => {
   const { id, state } = event.detail;
+  console.log({ id, state });
+  let task = newTaskList.getTaskById(id);
 
-  const task = activeTaskList.getTaskById(id);
-
-  if (task) {
-    task.state = state;
-    LocalStorage.save("tasks-active", activeTaskList);
+  if (!task) {
+    task = inProgressTaskList.getTaskById(id);
+    if (task) {
+      inProgressTaskList.removeTask(task);
+    }
+  } else {
+    newTaskList.removeTask(task);
   }
+
+  if (!task) {
+    task = completedTaskList.getTaskById(id);
+    if (task) {
+      completedTaskList.removeTask(task);
+    }
+  }
+
+  task.state = state;
+
+  if (state === STATES.NEW) {
+    newTaskList.addTask(task);
+  }
+
+  if (state === STATES.IN_PROGRESS) {
+    inProgressTaskList.addTask(task);
+  }
+
+  if (state === STATES.COMPLETED) {
+    completedTaskList.addTask(task);
+  }
+
+  LocalStorage.save(TASKS.NEW, newTaskList.toString());
+  LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
+  LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 });
 
 // Evento de tarea eliminada
 document.addEventListener("task-deleted", (event) => {
   const { id } = event.detail;
 
-  const task = activeTaskList.getTaskById(id);
+  let task = newTaskList.getTaskById(id);
 
-  if (task) {
-    try {
-      activeTaskList.removeTask(task);
-      LocalStorage.save("tasks-active", activeTaskList);
-    } catch (error) {
-      console.error(error.message);
+  if (!task) {
+    task = inProgressTaskList.getTaskById(id);
+    if (task) {
+      inProgressTaskList.removeTask(task);
+    }
+  } else {
+    newTaskList.removeTask(task);
+  }
+
+  if (!task) {
+    task = completedTaskList.getTaskById(id);
+    if (task) {
+      completedTaskList.removeTask(task);
     }
   }
+
+  LocalStorage.save(TASKS.NEW, newTaskList.toString());
+  LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
+  LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 });
 
 function toggleAddTaskFormVisibility(isVisible) {
