@@ -2,6 +2,10 @@
   padding: 1rem;
 }
 
+.task-list h2 {
+  margin-bottom: 1rem;
+}
+
 .task-container {
   width: 100%;
   position: relative;
