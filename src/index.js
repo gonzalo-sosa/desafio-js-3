@@ -4,6 +4,8 @@ import { Task, TaskList, LocalStorage } from "./modules/index";
 import { TaskElement } from "./components/index";
 import { STATES, TASKS } from "./consts";
 
+// TODO: quitar popover a realizar click en algún botón de la lista
+
 // Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
 const inProgressTaskList = new TaskList(
@@ -107,18 +109,32 @@ document.addEventListener("state-changed", (event) => {
     }
   }
 
-  if (task) task.state = state;
+  if (!task) {
+    return;
+  }
 
+  task.state = state;
+
+  // Remueve el elemento del DOM
+  const taskElement = document.querySelector(`task-element[id="${id}"]`);
+  if (taskElement) {
+    taskElement.remove();
+  }
+
+  // Agrega la tarea a la nueva lista
   if (state === STATES.NEW) {
     newTaskList.addTask(task);
+    $taskListNew.appendChild(taskElement);
   }
 
   if (state === STATES.IN_PROGRESS) {
     inProgressTaskList.addTask(task);
+    $taskListInProgress.appendChild(taskElement);
   }
 
   if (state === STATES.COMPLETED) {
     completedTaskList.addTask(task);
+    $taskListCompleted.appendChild(taskElement);
   }
 
   LocalStorage.save(TASKS.NEW, newTaskList.toString());
