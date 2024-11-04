@@ -1,4 +1,7 @@
-// Para la posición
-// navigator.geolocation.getCurrentPosition((position) =>
-//   console.log(position.coords)
-// );
+export function getCurrentPosition() {
+  let position;
+  navigator.geolocation.getCurrentPosition((pos) => {
+    position = pos;
+  });
+  return position;
+}
