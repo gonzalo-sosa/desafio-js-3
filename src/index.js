@@ -1,66 +1,58 @@
 import "./styles/main.css";
 
-import { Task, TaskList, TaskElement } from "./components/Task/index";
+import { Task } from "./modules/Task";
+import { TaskList } from "./modules/TaskList";
+import { TaskElement } from "./components/index";
+import { LocalStorage } from "./modules/LocalStorage";
 
-const task1 = new Task("Tarea 1", "Esta es mi primer tarea", "10/10/2024");
-const task2 = new Task("Tarea 2", "Esta es mi segunda tarea", "10/10/2024");
-const task3 = new Task("Tarea 3", "Esta es mi tercera tarea", "10/10/2024");
-const task4 = new Task("Tarea 4", "Esta es mi cuarta tarea", "10/10/2024");
-
+// TODO: agregar al local storage cuando se cambia el estado de una tarea
 // TODO: agregar ícono para borrar tarea
 
-var activeTaskList = new TaskList(
+const activeTaskList = new TaskList(
   JSON.parse(localStorage.getItem("tasks-active") || "[]")
 );
 
-var completedTaskList = new TaskList(
+const completedTaskList = new TaskList(
   JSON.parse(localStorage.getItem("tasks-completed") || "[]")
 );
 
-// activeTaskList.addTask(task1);
-// activeTaskList.addTask(task2);
-// activeTaskList.addTask(task3);
-
-//completedTaskList.addTask(task4);
-
-localStorage.setItem("tasks-active", activeTaskList.toString());
-localStorage.setItem("tasks-completed", completedTaskList.toString());
-
-// localStorage.clear(); // para evitar que se llene de tareas mientras se desarrolla la app
+LocalStorage.save("tasks-active", activeTaskList.toString());
+LocalStorage.save("tasks-completed", completedTaskList.toString());
 
 const $taskListNew = document.getElementById("tasksNew");
 const $taskListCompleted = document.getElementById("tasksCompleted");
+const $addTask = document.getElementById("addTaskBtn");
+const $addTaskForm = document.getElementById("addTaskForm");
 
-for (const task of activeTaskList.list) {
-  addTaskElementToListElement(task, $taskListNew);
-}
+// Cargar tareas
+activeTaskList
+  .getTasks()
+  .forEach((task) => addTaskElementToListElement(task, $taskListNew));
 
-for (const task of completedTaskList.list) {
-  addTaskElementToListElement(task, $taskListCompleted);
-}
+completedTaskList
+  .getTasks()
+  .forEach((task) => addTaskElementToListElement(task, $taskListCompleted));
 
-var $addTask = document.getElementById("addTaskBtn");
-var $form = document.getElementById("addTaskForm");
+// Manejo del formulario para agregar tareas
+$addTaskForm.addEventListener("submit", (event) => {
+  event.preventDefault();
 
-$form.addEventListener("submit", (event) => {
   const { title, description, dueDate } = getFormData(event);
-  console.log(title, description, dueDate);
-  const task = new Task(title, description, dueDate);
 
-  console.log({ task });
+  const task = new Task(title, description, dueDate);
 
   activeTaskList.addTask(task);
 
   addTaskElementToListElement(task, $taskListNew);
 
-  localStorage.setItem("tasks-active", activeTaskList.toString());
+  LocalStorage.save("tasks-active", activeTaskList.toString());
 
-  $form.classList.remove("active");
+  $addTaskForm.classList.remove("active");
   $addTask.classList.add("active");
 });
 
 $addTask.addEventListener("click", function () {
-  $form.classList.add("active");
+  $addTaskForm.classList.add("active");
   $addTask.classList.remove("active");
 });
 
@@ -68,9 +60,7 @@ function addTaskElementToListElement(
   { title, description, dueDate, state, location },
   list
 ) {
-  list.insertAdjacentHTML(
-    "beforeend",
-    `<task-element
+  const taskElement = `<task-element
       class="task-container"
       title="${title}" 
       due-date="${new Date(dueDate).toLocaleDateString()}"
@@ -78,15 +68,15 @@ function addTaskElementToListElement(
       location="${location}" 
     >
     ${description}
-    </task-element>`
-  );
+    </task-element>`;
+
+  list.insertAdjacentHTML("beforeend", taskElement);
 }
 
 function getFormData(event) {
-  event.preventDefault();
-  const $form = event.target;
+  const $addTaskForm = event.target;
 
-  const data = new FormData($form);
+  const data = new FormData($addTaskForm);
 
   const title = data.get("title");
   const description = data.get("description");
