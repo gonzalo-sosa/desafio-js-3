@@ -33,8 +33,11 @@
   align-items: center;
   column-gap: 0.5rem;
   text-align: center;
-  padding: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 2rem;
   display: none;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
 
 #addTaskForm.active {
@@ -51,6 +54,8 @@
 }
 
 #addTaskForm button {
+  margin-inline: auto;
+  width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
