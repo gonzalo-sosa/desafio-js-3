@@ -1,10 +1,7 @@
 import "./styles/main.css";
 
-import { Task } from "./modules/Task";
-import { TaskList } from "./modules/TaskList";
+import { Task, TaskList, LocalStorage } from "./modules/index";
 import { TaskElement } from "./components/index";
-import { LocalStorage } from "./modules/LocalStorage";
-
 // TODO: agregar al local storage cuando se cambia el estado de una tarea
 // TODO: agregar ícono para borrar tarea
 
