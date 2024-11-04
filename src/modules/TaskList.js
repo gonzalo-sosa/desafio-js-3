@@ -1,13 +1,17 @@
 import { Task } from "./Task";
 
 export class TaskList {
+  /** 
+    @param {Array<Task>} tasks
+  */
   constructor(tasks) {
     this._list = tasks ?? [];
   }
 
+  /** 
+    @param {Task} task
+  */
   addTask(task) {
-    if (!(task instanceof Task)) throw new Error("No es tarea válida.");
-
     this._list.push(task);
   }
 
@@ -23,6 +27,10 @@ export class TaskList {
     return this._list;
   }
 
+  /**
+   * @param {string} id
+   * @returns {Task}
+   */
   getTaskById(id) {
     return this._list.find((task) => task.id === id);
   }
