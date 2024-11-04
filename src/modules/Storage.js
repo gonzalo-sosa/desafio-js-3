@@ -1,9 +1,9 @@
 export class Storage {
-  save() {
+  static save() {
     throw new Error("Se debe de implementar el método 'save'");
   }
 
-  load() {
+  static load() {
     throw new Error("Se debe de implementar el método 'save'");
   }
 }
