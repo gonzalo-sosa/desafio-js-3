@@ -44,21 +44,20 @@ $addTaskForm.addEventListener("submit", (event) => {
 
   LocalStorage.save("tasks-active", activeTaskList.toString());
 
-  $addTaskForm.classList.remove("active");
-  $addTask.classList.add("active");
+  toggleAddTaskFormVisibility(false);
 });
 
 $addTask.addEventListener("click", function () {
-  $addTaskForm.classList.add("active");
-  $addTask.classList.remove("active");
+  toggleAddTaskFormVisibility(true);
 });
 
 function addTaskElementToListElement(
-  { title, description, dueDate, state, location },
+  { id, title, description, dueDate, state, location },
   list
 ) {
   const taskElement = `<task-element
       class="task-container"
+      id="${id}"
       title="${title}" 
       due-date="${new Date(dueDate).toLocaleDateString()}"
       state="${state}"
@@ -68,6 +67,11 @@ function addTaskElementToListElement(
     </task-element>`;
 
   list.insertAdjacentHTML("beforeend", taskElement);
+}
+
+function toggleAddTaskFormVisibility(isVisible) {
+  $addTaskForm.classList.toggle("active", isVisible);
+  $addTask.classList.toggle("active", !isVisible);
 }
 
 function getFormData(event) {
