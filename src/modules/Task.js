@@ -1,4 +1,4 @@
-import { STATES_LABEL } from "../consts";
+import { STATES } from "../consts";
 import { createUUID } from "../utils/generator";
 import { isString } from "../utils/validator";
 
@@ -13,7 +13,7 @@ export class Task {
     this.title = title;
     this.description = description;
     this.dueDate = new Date(dueDate);
-    this._state = STATES_LABEL.NEW;
+    this._state = STATES.NEW;
     this.location = "location";
   }
 
