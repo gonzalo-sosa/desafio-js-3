@@ -28,6 +28,7 @@ export class TaskElement extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         .task {
+          box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
           position: relative;
           display: grid;
           grid-template-columns: 1fr 2fr 3fr 1fr 1fr;
@@ -112,8 +113,6 @@ export class TaskElement extends HTMLElement {
     this.btnState = this.shadowRoot.querySelector(".task__btn");
     this.popoverElement = this.task.querySelector("popover-element");
     this.btnDelete = this.shadowRoot.querySelector(".task__delete");
-
-    this.updateBtn(this.btnColor);
   }
 
   bindEvents() {
@@ -148,15 +147,15 @@ export class TaskElement extends HTMLElement {
     this.popoverElement.appendChild($list);
   }
 
-  connectedCallback() {
-    this.updateBtn(this.btnColor); // Actualiza el botón al agregar el elemento al DOM
-  }
+  // connectedCallback() {
+  //   this.updateBtn(this.btnColor);
+  // }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === "state" && oldValue !== newValue) {
       this.state = newValue;
-      this.updateBtn(STATES_COLOR[newValue]);
-      this.handleChangeState(); // Actualiza el color del botón si cambia el estado
+      this.updateBtn(STATES_COLOR[newValue]); // Actualiza el color del botón si cambia el estado
+      this.handleChangeState();
     }
   }
 
