@@ -4,8 +4,6 @@ import { Task, TaskList, LocalStorage } from "./modules/index";
 import { TaskElement } from "./components/index";
 import { STATES, TASKS } from "./consts";
 
-// TODO: quitar popover a realizar click en algún botón de la lista
-
 // Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
 const inProgressTaskList = new TaskList(
@@ -90,7 +88,7 @@ function addTaskElementToListElement(
 // Evento de cambio de estado de tarea
 document.addEventListener("state-changed", (event) => {
   const { id, state } = event.detail;
-  console.log({ id, state });
+
   let task = newTaskList.getTaskById(id);
 
   if (!task) {
