@@ -3,7 +3,7 @@ import { createUUID } from "../utils/generator";
 import { isString } from "../utils/validator";
 
 export class Task {
-  constructor(title, description, dueDate) {
+  constructor(title, description, dueDate, latitude, longitude) {
     if (!title || !isString(title))
       throw new Error("Título es requerido y debe ser string.");
     if (!description || !isString(description))
@@ -14,7 +14,8 @@ export class Task {
     this.description = description;
     this.dueDate = new Date(dueDate);
     this._state = STATES.NEW;
-    this.location = "location";
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   get id() {
@@ -37,7 +38,8 @@ export class Task {
       description: this.description,
       dueDate: this.dueDate.toISOString(),
       state: this.state,
-      location: this.location,
+      latitude: this.latitude,
+      longitude: this.longitude,
     };
   }
 }
