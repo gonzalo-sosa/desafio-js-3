@@ -1,6 +1,7 @@
 import { STATES, STATES_COLOR, STATES_LABEL } from "../consts";
 import { PopoverElement } from "./PopoverElement";
 import { StateIconElement } from "./StateIconElement";
+import * as L from "leaflet";
 
 export class TaskElement extends HTMLElement {
   static get observedAttributes() {
@@ -15,7 +16,10 @@ export class TaskElement extends HTMLElement {
     this.id = this.getAttribute("id");
     this.title = this.getAttribute("title") || "";
     this.dueDate = this.getAttribute("due-date") || "";
-    this.location = this.getAttribute("location") || "location";
+    this.location = [
+      this.getAttribute("latitude"),
+      this.getAttribute("longitude"),
+    ];
     this.state = this.getAttribute("state") || STATES.NEW;
     this.btnColor = STATES_COLOR[this.state];
 
@@ -100,7 +104,7 @@ export class TaskElement extends HTMLElement {
         <h4 class="task__title">${this.title}</h4>
         <p class="task__description"><slot></slot></p>
         <span class="task__dueDate">${this.dueDate}</span>
-        <span class="task__location">${this.location}</span>
+        <div class="task__location"></div>
         <button class="task__delete">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="7px"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
           </svg>
@@ -109,18 +113,19 @@ export class TaskElement extends HTMLElement {
   }
 
   initElements() {
-    this.task = this.shadowRoot.querySelector("article");
-    this.btnState = this.shadowRoot.querySelector(".task__btn");
-    this.popoverElement = this.task.querySelector("popover-element");
-    this.btnDelete = this.shadowRoot.querySelector(".task__delete");
+    this.$task = this.shadowRoot.querySelector("article");
+    this.$btnState = this.$task.querySelector(".task__btn");
+    this.$popover = this.$task.querySelector("popover-element");
+    this.$btnDelete = this.$task.querySelector(".task__delete");
+    this.$location = this.$task.querySelector(".task__location");
   }
 
   bindEvents() {
-    this.btnState.addEventListener("click", () =>
-      this.popoverElement.togglePopover()
+    this.$btnState.addEventListener("click", () =>
+      this.$popover.togglePopover()
     );
 
-    this.btnDelete.addEventListener("click", this.handleDelete.bind(this));
+    this.$btnDelete.addEventListener("click", this.handleDelete.bind(this));
 
     this.createStateList();
   }
@@ -144,12 +149,13 @@ export class TaskElement extends HTMLElement {
       $list.appendChild($listItem);
     }
 
-    this.popoverElement.appendChild($list);
+    this.$popover.appendChild($list);
   }
 
-  // connectedCallback() {
-  //   this.updateBtn(this.btnColor);
-  // }
+  // Crear ícono que al realizar hover muestre la latitud y la longitud
+  createMapIcon() {}
+
+  connectedCallback() {}
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === "state" && oldValue !== newValue) {
@@ -165,7 +171,7 @@ export class TaskElement extends HTMLElement {
   }
 
   updateBtn(color) {
-    this.btnState.style.backgroundColor = color;
+    this.$btnState.style.backgroundColor = color;
   }
 
   handleChangeState() {
@@ -190,11 +196,8 @@ export class TaskElement extends HTMLElement {
   }
 
   disconnectedCallback() {
-    this.btnState.removeEventListener(
-      "click",
-      this.popoverElement.togglePopover()
-    );
-    this.btnDelete.removeEventListener("click", this.handleDelete);
+    this.$btnState.removeEventListener("click", this.$popover.togglePopover());
+    this.$btnDelete.removeEventListener("click", this.handleDelete);
   }
 }
 
