@@ -1,7 +1,9 @@
+// TODO: quitar popover al realizar click fuera de la lista
+
 export class PopoverElement extends HTMLElement {
   constructor() {
     super();
-    this.open = this.getAttribute("open") ?? false;
+    this.open = this.getAttribute("open") === "true";
 
     this.attachShadow({ mode: "open" });
     this.shadowRoot.innerHTML = `
@@ -30,7 +32,9 @@ export class PopoverElement extends HTMLElement {
     this.div.classList.toggle("popover--open");
   }
 
-  //connectedCallback() {}
+  disconnectedCallback() {
+    this.togglePopover();
+  }
 }
 
 customElements.define("popover-element", PopoverElement);
