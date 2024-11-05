@@ -155,7 +155,7 @@ export class TaskElement extends HTMLElement {
   // Crear ícono que al realizar hover muestre la latitud y la longitud
   createMapIcon() {}
 
-  connectedCallback() {}
+  //connectedCallback() {}
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === "state" && oldValue !== newValue) {

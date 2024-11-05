@@ -15,7 +15,7 @@ export class StateIconElement extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "color") {
+    if (name === "color" && oldValue !== newValue) {
       this.updateColor(newValue);
     }
   }
