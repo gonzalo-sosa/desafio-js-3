@@ -96,7 +96,7 @@ export class TaskElement extends HTMLElement {
         }
       </style>
       <article class="task">
-        <button class="task__btn"><popover-element></popover-element></button>
+        <button class="task__btn"><popover-element open="false"></popover-element></button>
         <h4 class="task__title">${this.title}</h4>
         <p class="task__description"><slot></slot></p>
         <span class="task__dueDate">${this.dueDate}</span>
