@@ -5,11 +5,13 @@ import { STATES, TASKS } from "./consts";
 import { getPosition } from "./services/location";
 import { TabContent, TabManager } from "./components/index";
 import {
+  getFormData,
   addContentToCanvas,
   addContentToDetails,
   addContentToMap,
   addTaskElementToListElement,
   toggleAddTaskFormVisibility,
+  changeTabManagerContent,
 } from "./utils/dom";
 import * as L from "leaflet";
 
@@ -72,11 +74,11 @@ $addTaskForm.addEventListener("submit", async (event) => {
 
   LocalStorage.save(TASKS.NEW, newTaskList.toString());
 
-  toggleAddTaskFormVisibility(false);
+  toggleAddTaskFormVisibility($addTaskForm, $addTask, false);
 });
 
 $addTask.addEventListener("click", function () {
-  toggleAddTaskFormVisibility(true);
+  toggleAddTaskFormVisibility($addTaskForm, $addTask, true);
 });
 
 // Evento de cambio de estado de tarea
@@ -201,5 +203,13 @@ const $map = document.querySelector("[tab-content-name=map]");
 const $canvas = document.querySelector("[tab-content-name=canvas]");
 
 addContentToDetails($details);
-addContentToMap($map);
+const LMap = addContentToMap($map);
 addContentToCanvas($canvas);
+
+const $tasks = document.querySelectorAll("task-element");
+
+$tasks.forEach(($task) => {
+  $task.addEventListener("click", (event) =>
+    changeTabManagerContent(event, undefined, LMap, undefined)
+  );
+});
