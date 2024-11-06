@@ -102,12 +102,18 @@ export function addContentToMap(map) {
   $mapContainer.innerHTML = icon;
   $mapContainer.appendChild(mapText);
 
+  createMap(container);
+
+  map.target.appendChild($mapContainer);
+}
+
+function createMap(container) {
   const latitude = -34.61315;
   const longitude = -58.67723;
 
-  // TODO: arreglar mapa, no tiene el mismo tamaño que el contenedor
+  // TODO: realizar resize al renderizar por primera vez
 
-  const lMap = L.map($mapContainer, {
+  const lMap = L.map(container, {
     minZoom: 10,
     dragging: false,
   }).setView([latitude, longitude], 10);
@@ -118,7 +124,7 @@ export function addContentToMap(map) {
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(lMap);
 
-  map.target.appendChild($mapContainer);
+  return lMap;
 }
 
 export function addContentToCanvas(canvas) {
