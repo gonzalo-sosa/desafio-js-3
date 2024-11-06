@@ -8,13 +8,14 @@ export class TaskElement extends HTMLElement {
     return ["state"];
   }
 
-  constructor(id, title, dueDate, location, state) {
+  constructor(id, title, description, dueDate, location, state) {
     super();
     this.attachShadow({ mode: "open" });
 
     // Propiedades
     this.id = id ?? this.getAttribute("id");
     this.title = title ?? this.getAttribute("title");
+    this.description = description ?? this.getAttribute("description");
     this.dueDate = new Date(dueDate) ?? new Date(this.getAttribute("due-date"));
     this.location = location ?? [
       this.getAttribute("latitude"),
@@ -139,6 +140,7 @@ export class TaskElement extends HTMLElement {
   }
 
   connectedCallback() {
+    this.setAttribute("description", this.description);
     this.setAttribute("state", this.state);
   }
 
