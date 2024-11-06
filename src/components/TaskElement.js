@@ -8,19 +8,19 @@ export class TaskElement extends HTMLElement {
     return ["state"];
   }
 
-  constructor() {
+  constructor(id, title, dueDate, location, state) {
     super();
     this.attachShadow({ mode: "open" });
 
     // Propiedades
-    this.id = this.getAttribute("id");
-    this.title = this.getAttribute("title") || "";
-    this.dueDate = this.getAttribute("due-date") || "";
-    this.location = [
+    this.id = id ?? this.getAttribute("id");
+    this.title = title ?? this.getAttribute("title");
+    this.dueDate = new Date(dueDate) ?? new Date(this.getAttribute("due-date"));
+    this.location = location ?? [
       this.getAttribute("latitude"),
       this.getAttribute("longitude"),
     ];
-    this.state = this.getAttribute("state") || STATES.NEW;
+    this.state = (state || this.getAttribute("state")) ?? STATES.NEW;
     this.btnColor = STATES_COLOR[this.state];
 
     this.render();
@@ -31,51 +31,38 @@ export class TaskElement extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-        .task {
-          box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
-          position: relative;
-          display: grid;
-          grid-template-columns: 1fr 2fr 3fr 1fr 1fr;
-          align-content: center;
+        .task{  
+          padding: .35rem;
+          display: flex;
+          flex-direction: row;
+          gap: 1.2rem;
           align-items: center;
-          column-gap: .5rem;
-          padding-right: 5px;
         }
-        
-        .task__btn {
-          margin: auto;
-          outline: 0;
-          border: none;
+        .task__btn{
+          margin-top: .35rem;
+          align-self: start;
+          width: 15px;
+          height: 15px;
           border-radius: 100%;
-          padding: .75rem;
-        }
-
-        .task__title,
-        .task__dueDate,
-        .task__location
-        {
-          text-align: center;
-        }
-
-        .task__description{
-          margin-inline: .5rem;
-          text-wrap: balance;
-        }
-
-        .task__location{
-          padding-right: 1rem;
-        }
-
-        .task__delete{
-          position: absolute;
-          top: 0;
-          right: 0;
-          font-size: 10px;
+          border: none;
           outline: 0;
-          border: 0;
-          border-radius: .25rem;
         }
-
+        .task__data{
+          display: flex;
+          flex-direction: column;
+          gap: .35rem;
+        }
+        .task__dueDate{
+          font-size: .75rem;
+          opacity: .5;
+        }
+        .task__delete{
+          align-self: start;
+          border-radius: .5rem;
+          padding: .35rem .75rem;
+          border: none;
+          outline: 0;
+        }
         .state-list{
           display: flex;
           flex-direction: column;
@@ -101,10 +88,10 @@ export class TaskElement extends HTMLElement {
       </style>
       <article class="task">
         <button class="task__btn"><popover-element open="false"></popover-element></button>
-        <h4 class="task__title">${this.title}</h4>
-        <p class="task__description"><slot></slot></p>
-        <span class="task__dueDate">${this.dueDate}</span>
-        <div class="task__location"></div>
+        <div class="task__data">
+          <span class="task__title">${this.title}</span>
+          <span class="task__dueDate">Vencimiento: ${this.dueDate.toLocaleDateString()}</span>
+        </div>
         <button class="task__delete">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="7px"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
           </svg>
@@ -113,11 +100,10 @@ export class TaskElement extends HTMLElement {
   }
 
   initElements() {
-    this.$task = this.shadowRoot.querySelector("article");
+    this.$task = this.shadowRoot.querySelector(".task");
     this.$btnState = this.$task.querySelector(".task__btn");
     this.$popover = this.$task.querySelector("popover-element");
     this.$btnDelete = this.$task.querySelector(".task__delete");
-    this.$location = this.$task.querySelector(".task__location");
   }
 
   bindEvents() {
@@ -152,10 +138,9 @@ export class TaskElement extends HTMLElement {
     this.$popover.appendChild($list);
   }
 
-  // Crear ícono que al realizar hover muestre la latitud y la longitud
-  createMapIcon() {}
-
-  //connectedCallback() {}
+  connectedCallback() {
+    this.setAttribute("state", this.state);
+  }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === "state" && oldValue !== newValue) {
