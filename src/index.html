@@ -12,72 +12,43 @@
     />
   </head>
   <body>
-    <main>
-      <h1 style="text-align: center">Tareas</h1>
-      <section>
-        <ul id="tasksNew" class="task-list">
-          <h2>Pendientes</h2>
-        </ul>
-        <div style="padding: 1rem">
-          <form id="addTaskForm">
-            <state-icon-element></state-icon-element>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              required
-              placeholder="Título..."
-            />
-            <input
-              type="text"
-              id="description"
-              name="description"
-              required
-              placeholder="Descripción..."
-            />
-            <input type="date" id="due-date" name="due-date" required />
-            <button>
-              <svg
-                style="vertical-align: middle; display: inline-block"
-                xmlns="http://www.w3.org/2000/svg"
-                width="1rem"
-                viewBox="0 0 448 512"
-              >
-                <path
-                  d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
-                />
-              </svg>
-            </button>
-          </form>
-          <button id="addTaskBtn" class="active">
-            <svg
-              style="
-                vertical-align: middle;
-                display: inline-block;
-                margin-right: 0.5rem;
-              "
-              xmlns="http://www.w3.org/2000/svg"
-              width="1rem"
-              viewBox="0 0 448 512"
-            >
-              <path
-                d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"
-              />
-            </svg>
-            Agregar tarea
-          </button>
+    <div class="flex h-screen bg-gray-100">
+      <aside id="sidebar" class="w-64 bg-white p-4 border-r">
+        <h2 class="text-2xl font-bold mb-4">Tareas</h2>
+        <button id="addTaskBtn" class="w-full mb-4">Nueva Tarea</button>
+        <form id="addTaskForm">
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="Título..."
+            autofocus
+            required
+          />
+          <input
+            id="description"
+            name="description"
+            placeholder="Descripción..."
+            required
+          />
+          <input type="date" id="due-date" name="due-date" required />
+          <button>Agregar</button>
+        </form>
+        <div id="taskList" class="h-[calc(100vh-150px)] w-full flex flex-col">
+          <div id="tasksNew">
+            <h2>Nuevas</h2>
+          </div>
+          <div id="tasksInProgress">
+            <h2>En progreso</h2>
+          </div>
+          <div id="tasksCompleted">
+            <h2>Completadas</h2>
+          </div>
         </div>
-        <ul id="tasksInProgress" class="task-list">
-          <h2>En progreso</h2>
-        </ul>
-        <ul id="tasksCompleted" class="task-list">
-          <h2>Completadas</h2>
-        </ul>
-      </section>
-      <section>
-        <h2>Ubicaciones</h2>
-        <div id="map"></div>
-      </section>
-    </main>
+      </aside>
+      <main id="main" class="flex-1 p-4">
+        <notification-element></notification-element>
+      </main>
+    </div>
   </body>
 </html>

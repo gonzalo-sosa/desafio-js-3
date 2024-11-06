@@ -1,9 +1,17 @@
 import "./styles/main.css";
 
 import { Task, TaskList, LocalStorage } from "./modules/index";
-import { TaskElement } from "./components/index";
-import { STATES, STATES_COLOR, TASKS } from "./consts";
+import { STATES, TASKS } from "./consts";
 import { getPosition } from "./services/location";
+import { TabContent, TabManager } from "./components/index";
+import {
+  addContentToCanvas,
+  addContentToDetails,
+  addContentToMap,
+  addTaskElementToListElement,
+  toggleAddTaskFormVisibility,
+} from "./utils/dom";
+import * as L from "leaflet";
 
 // Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
@@ -19,7 +27,9 @@ LocalStorage.save(TASKS.NEW, newTaskList.toString());
 LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
 LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 
-// Obtener listas de tareas (ul)
+// Obtener elementos y listas de tareas
+const $sidebar = document.getElementById("sidebar");
+const $taskList = document.getElementById("taskList");
 const $taskListNew = document.getElementById("tasksNew");
 const $taskListInProgress = document.getElementById("tasksInProgress");
 const $taskListCompleted = document.getElementById("tasksCompleted");
@@ -41,6 +51,9 @@ if (completedTaskList.getTasks().length > 0)
   completedTaskList.getTasks().forEach((task) => {
     addTaskElementToListElement(task, $taskListCompleted);
   });
+
+// Agregar lista de tareas al sidebar
+$sidebar.appendChild($taskList);
 
 // Manejo del formulario para agregar tareas
 $addTaskForm.addEventListener("submit", async (event) => {
@@ -65,30 +78,6 @@ $addTaskForm.addEventListener("submit", async (event) => {
 $addTask.addEventListener("click", function () {
   toggleAddTaskFormVisibility(true);
 });
-
-/**
- * @param {Task} obj
- * @param {TaskList} list
- *
- */
-function addTaskElementToListElement(
-  { id, title, description, dueDate, state, latitude, longitude },
-  list
-) {
-  const taskElement = `<task-element
-      class="task-container"
-      id="${id}"
-      title="${title}" 
-      due-date="${new Date(dueDate).toLocaleDateString()}"
-      state="${state}"
-      latitude="${latitude}" 
-      longitude="${longitude}"
-    >
-    ${description}
-    </task-element>`;
-
-  list.insertAdjacentHTML("beforeend", taskElement);
-}
 
 // Evento de cambio de estado de tarea
 document.addEventListener("state-changed", (event) => {
@@ -172,73 +161,45 @@ document.addEventListener("task-deleted", (event) => {
   LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 });
 
-function toggleAddTaskFormVisibility(isVisible) {
-  $addTaskForm.classList.toggle("active", isVisible);
-  $addTask.classList.toggle("active", !isVisible);
-}
+const $main = document.getElementById("main");
+const $tabManager = new TabManager();
+const tabs = $tabManager.tabs;
 
-function getFormData(event) {
-  const $addTaskForm = event.target;
+const CONTENTS = [
+  {
+    title: "Detalles de la Tarea",
+    description: "Edita los detalles de tu tarea aquí",
+  },
+  {
+    title: "Ubicación de la Tarea",
+    description: "Ver la ubicación en el mapa",
+  },
+  {
+    title: "Área de Dibujo",
+    description: "Dibuja algo relacionado con tu tarea",
+  },
+];
 
-  const data = new FormData($addTaskForm);
+const $tabsContent = tabs.map((tab, i) => {
+  const $tabContent = new TabContent(
+    tab,
+    CONTENTS[i].title,
+    CONTENTS[i].description
+  );
 
-  const title = data.get("title");
-  const description = data.get("description");
-  const dueDate = data.get("due-date");
-
-  return {
-    title,
-    description,
-    dueDate,
-  };
-}
-
-// Mapa
-const $map = document.getElementById("map");
-$map.style.height = "300px";
-
-const latitude = -34.61315;
-const longitude = -58.67723;
-
-const map = L.map($map, {
-  center: [latitude, longitude],
-  zoom: 10,
-  minZoom: 10,
+  return $tabContent;
 });
 
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution:
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-}).addTo(map);
+$tabsContent.forEach(($tabContent) =>
+  $tabManager.container.appendChild($tabContent)
+);
 
-// TODO: para cada tarea crear un marker del color de la tarea
-// TODO: cuando se elimina tarea también eliminar los markers
+$main.appendChild($tabManager);
 
-const markersForNew = newTaskList
-  .getTasks()
-  .map((task) => createMarkerInMapForTask(task));
+const $details = document.querySelector("[tab-content-name=details]");
+const $map = document.querySelector("[tab-content-name=map]");
+const $canvas = document.querySelector("[tab-content-name=canvas]");
 
-const markersForInProgress = inProgressTaskList
-  .getTasks()
-  .map((task) => createMarkerInMapForTask(task));
-
-const markersForCompleted = completedTaskList
-  .getTasks()
-  .map((task) => createMarkerInMapForTask(task));
-
-function createMarkerInMapForTask(task) {
-  const circle = L.circle(L.latLng(task.latitude, task.longitude), {
-    color: STATES_COLOR[task.state],
-    fillColor: STATES_COLOR[task.state],
-    fillOpacity: 0.5,
-    radius: 5,
-  }).addTo(map);
-
-  const marker = L.marker(L.latLng(task.latitude, task.longitude), {
-    alt: task.title,
-    title: task.title,
-  }).addTo(map);
-
-  return [circle, marker];
-}
+addContentToDetails($details);
+addContentToMap($map);
+addContentToCanvas($canvas);
