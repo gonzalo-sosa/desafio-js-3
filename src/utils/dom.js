@@ -11,6 +11,7 @@ export function addContentToDetails(details) {
   const $titleInput = document.createElement("input");
   $titleInput.type = "text";
   $titleInput.id = "title";
+  $titleInput.name = "title";
   $titleInput.placeholder = "Título de la tarea";
   $titleInput.classList.add(
     "flex",
@@ -42,6 +43,8 @@ export function addContentToDetails(details) {
   const $descriptionFieldContainer = document.createElement("div");
   $descriptionFieldContainer.classList.add("flex", "flex-col", "space-y-1.5");
   const $descriptionTextarea = document.createElement("textarea");
+  $descriptionTextarea.id = "description";
+  $descriptionTextarea.name = "description";
   $descriptionTextarea.placeholder = "Descripción de la tarea";
   $descriptionTextarea.classList.add(
     "flex",
@@ -69,6 +72,7 @@ export function addContentToDetails(details) {
   $dueDateFieldContainer.classList.add("grid", "gap-1.5");
   const $dueDateInput = document.createElement("input");
   $dueDateInput.type = "date";
+  $dueDateInput.id = "due-date";
   $dueDateInput.name = "due-date";
   $dueDateFieldContainer.appendChild($dueDateInput);
 
@@ -102,20 +106,18 @@ export function addContentToMap(map) {
   $mapContainer.innerHTML = icon;
   $mapContainer.appendChild(mapText);
 
-  createMap(container);
+  const LMap = createMap($mapContainer);
 
   map.target.appendChild($mapContainer);
+
+  return LMap;
 }
 
-function createMap(container) {
-  const latitude = -34.61315;
-  const longitude = -58.67723;
-
+function createMap(container, latitude = -34.61315, longitude = -58.67723) {
   // TODO: realizar resize al renderizar por primera vez
 
   const lMap = L.map(container, {
     minZoom: 10,
-    dragging: false,
   }).setView([latitude, longitude], 10);
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -227,9 +229,9 @@ export function addContentToCanvas(canvas) {
   $article.insertAdjacentHTML("beforeend", $buttonsContainer.outerHTML);
 }
 
-export function toggleAddTaskFormVisibility(isVisible) {
-  $addTaskForm.classList.toggle("active", isVisible);
-  $addTask.classList.toggle("active", !isVisible);
+export function toggleAddTaskFormVisibility(addTaskForm, addTask, isVisible) {
+  addTaskForm.classList.toggle("active", isVisible);
+  addTask.classList.toggle("active", !isVisible);
 }
 
 export function getFormData(event) {
@@ -258,36 +260,37 @@ export function createTaskElement(task) {
   const $taskElement = new TaskElement(
     task.id,
     task.title,
+    task.description,
     task.dueDate,
     [task.latitude, task.longitude],
     task.state
   );
 
-  $taskElement.addEventListener("click", (event) =>
-    changeTabManagerContent(event)
-  );
-
   return $taskElement;
 }
 
-function changeTabManagerContent(event) {
+export function changeTabManagerContent(event, details, map, canvas) {
   const $taskElement = event.target;
 
   const $tabManager = document.querySelector("tab-manager");
   const $details = $tabManager.querySelector("[tab-content-name=details]");
-  const $map = $tabManager.querySelector("[tab-content-name=map]");
-  const $canvas = $tabManager.querySelector("[tab-content-name=canvas]");
+  //const $canvas = $tabManager.querySelector("[tab-content-name=canvas]");
 
-  //editContentToDetails($details, $taskElement);
-  //editContentToMap($map);
+  editContentToDetails($details, $taskElement);
+  editViewToMap(map, $taskElement);
   //editContentToCanvas($canvas);
 }
 
 function editContentToDetails($details, task) {
-  const $form = $details.querySelector("form");
-  const $title = $form.getElementById("title");
-  const $description = $form.getElementById("description");
-  const $dueDate = $form.getElementById("dueDate");
+  const $title = $details.querySelector("[name=title]");
+  const $description = $details.querySelector("[name=description");
+  const $dueDate = $details.querySelector("[name=due-date]");
 
   $title.setAttribute("value", task.title);
+  $description.value = task.description ?? "";
+  $dueDate.setAttribute("value", task.dueDate.toISOString().split("T")[0]);
+}
+
+function editViewToMap(map, $taskElement) {
+  map.setView($taskElement.location, 15);
 }
