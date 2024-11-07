@@ -24,6 +24,9 @@ export class TaskElement extends HTMLElement {
     this.state = (state || this.getAttribute("state")) ?? STATES.NEW;
     this.btnColor = STATES_COLOR[this.state];
 
+    // drag y drop
+    this.draggable = true;
+
     this.render();
     this.initElements();
     this.bindEvents();
@@ -32,12 +35,13 @@ export class TaskElement extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-        .task{  
+        .task{
           padding: .35rem;
           display: flex;
           flex-direction: row;
           gap: 1.2rem;
           align-items: center;
+          justify-content: space-between;
         }
         .task__btn{
           margin-top: .35rem;
@@ -113,7 +117,6 @@ export class TaskElement extends HTMLElement {
     );
 
     this.$btnDelete.addEventListener("click", this.handleDelete.bind(this));
-
     this.createStateList();
   }
 
