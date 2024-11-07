@@ -1,4 +1,5 @@
 import { TaskElement } from "../components";
+import { STATES } from "../consts";
 
 export function addContentToDetails(details) {
   const $form = document.createElement("form");
@@ -110,18 +111,19 @@ export function addContentToMap(map) {
 
   map.target.appendChild($mapContainer);
 
+  LMap.invalidateSize();
+
   return LMap;
 }
 
 function createMap(container, latitude = -34.61315, longitude = -58.67723) {
-  // TODO: realizar resize al renderizar por primera vez
-
-  const lMap = L.map(container, {
-    minZoom: 10,
-  }).setView([latitude, longitude], 10);
+  const lMap = L.map(container, {}).setView([latitude, longitude], 13, {
+    animate: true,
+  });
 
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
+    minZoom: 10,
+    maxZoom: 20,
     attribution:
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(lMap);
@@ -131,6 +133,7 @@ function createMap(container, latitude = -34.61315, longitude = -58.67723) {
 
 export function addContentToCanvas(canvas) {
   const $drawingAreaContainer = document.createElement("div");
+  $drawingAreaContainer.id = "canvas";
   $drawingAreaContainer.classList.add(
     "w-full",
     "h-64",
@@ -143,12 +146,18 @@ export function addContentToCanvas(canvas) {
     "justify-center"
   );
 
+  const $canvas = document.createElement("canvas");
+  $canvas.width = 200;
+  $canvas.height = 100;
+
+  $drawingAreaContainer.appendChild($canvas);
+  /*
   const $drawingAreaText = document.createElement("span");
   $drawingAreaText.classList.add("ml-2");
   $drawingAreaText.textContent = "Área de dibujo";
 
   $drawingAreaContainer.appendChild($drawingAreaText);
-
+  */
   canvas.target.appendChild($drawingAreaContainer);
 
   const $buttonsContainer = document.createElement("div");
@@ -161,6 +170,7 @@ export function addContentToCanvas(canvas) {
   );
 
   const $clearButton = document.createElement("button");
+  $clearButton.id = "clear-canvas";
   $clearButton.classList.add(
     "inline-flex",
     "items-center",
@@ -193,6 +203,7 @@ export function addContentToCanvas(canvas) {
   $clearButton.textContent = "Limpiar";
 
   const $saveButton = document.createElement("button");
+  $saveButton.id = "save-canvas";
   $saveButton.classList.add(
     "inline-flex",
     "items-center",
@@ -266,19 +277,50 @@ export function createTaskElement(task) {
     task.state
   );
 
+  addEventsDragStartDragEnd($taskElement);
+
   return $taskElement;
 }
 
-export function changeTabManagerContent(event, details, map, canvas) {
+export function changeTabManagerContent(
+  event,
+  { newTaskList, inProgressTaskList, completedTaskList },
+  details,
+  map,
+  canvas
+) {
   const $taskElement = event.target;
+  const state = $taskElement.getAttribute("state");
+  const id = $taskElement.getAttribute("id");
+
+  // busco el task con las listas
+  let task = null;
+  switch (state) {
+    case STATES.NEW:
+      task = newTaskList.getTaskById(id);
+      break;
+
+    case STATES.IN_PROGRESS:
+      task = inProgressTaskList.getTaskById(id);
+      break;
+
+    case STATES.COMPLETED:
+      task = completedTaskList.getTaskById(id);
+      break;
+  }
 
   const $tabManager = document.querySelector("tab-manager");
   const $details = $tabManager.querySelector("[tab-content-name=details]");
-  //const $canvas = $tabManager.querySelector("[tab-content-name=canvas]");
+  const $canvas = $tabManager.querySelector("canvas");
 
-  editContentToDetails($details, $taskElement);
-  editViewToMap(map, $taskElement);
-  //editContentToCanvas($canvas);
+  $tabManager.setAttribute("task-id", id);
+
+  map.invalidateSize();
+
+  editContentToDetails($details, task);
+  editViewToMap(map, task);
+  addMarkerToMap(map, task);
+  editContentToCanvas($canvas, id);
 }
 
 function editContentToDetails($details, task) {
@@ -288,9 +330,89 @@ function editContentToDetails($details, task) {
 
   $title.setAttribute("value", task.title);
   $description.value = task.description ?? "";
-  $dueDate.setAttribute("value", task.dueDate.toISOString().split("T")[0]);
+  $dueDate.setAttribute(
+    "value",
+    new Date(task.dueDate).toISOString().split("T")[0]
+  );
 }
 
-function editViewToMap(map, $taskElement) {
-  map.setView($taskElement.location, 15);
+function editViewToMap(map, task) {
+  map.setView([task.latitude, task.longitude], 15);
+}
+
+export var markers = {};
+
+function addMarkerToMap(map, task) {
+  if (!markers[task.id]) {
+    L.marker([task.latitude, task.longitude]).addTo(map);
+    markers[`${task.id}`] = true;
+  }
+}
+
+function editContentToCanvas(canvas, id) {
+  // traer de local storage sino dejarlo como estaba
+  const canvasData = localStorage.getItem(`${id}-canvas`);
+  if (canvasData) {
+    let img = new Image();
+    img.onload = function () {
+      let context = canvas.getContext("2d");
+      context.drawImage(img, 0, 0);
+    };
+
+    img.src = canvasData;
+  } else {
+    let context = canvas.getContext("2d");
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+export var draggedElement = null;
+export var sourceContainer = null;
+
+export function addEventsDragStartDragEnd(target) {
+  target.addEventListener("dragstart", handleDragStart);
+  target.addEventListener("dragend", handleDragEnd);
+}
+
+function handleDragStart(event) {
+  draggedElement = event.target;
+  sourceContainer = draggedElement.parentNode;
+}
+
+function handleDragEnd(event) {
+  draggedElement = null;
+  sourceContainer = null;
+}
+
+export function handleDropTask(event) {
+  console.log("DROP");
+  event.preventDefault();
+
+  let { target } = event;
+
+  if (!target) {
+    return;
+  }
+
+  if (target.parentNode.getAttribute("id") !== "taskList") {
+    target = target.parentNode;
+  }
+
+  if (target !== sourceContainer && draggedElement) {
+    sourceContainer.removeChild(draggedElement);
+
+    target.appendChild(draggedElement);
+
+    draggedElement.updateState(target.getAttribute("state"));
+  }
+}
+
+export function handleDragOverTask(event) {
+  event.preventDefault();
+}
+
+export function handleDragLeaveTask(event) {
+  console.log("DRAG LEAVE");
 }
