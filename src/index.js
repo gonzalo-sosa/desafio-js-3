@@ -3,7 +3,7 @@ import "./styles/main.css";
 import { Task, TaskList, LocalStorage } from "./modules/index";
 import { STATES, TASKS } from "./consts";
 import { getPosition } from "./services/location";
-import { TabContent, TabManager } from "./components/index";
+import { TabContent, TabManager, TaskElement } from "./components/index";
 import {
   getFormData,
   addContentToCanvas,
@@ -12,6 +12,10 @@ import {
   addTaskElementToListElement,
   toggleAddTaskFormVisibility,
   changeTabManagerContent,
+  handleDropTask,
+  handleDragOverTask,
+  handleDragLeaveTask,
+  addEventsDragStartDragEnd,
 } from "./utils/dom";
 import * as L from "leaflet";
 
@@ -75,6 +79,10 @@ $addTaskForm.addEventListener("submit", async (event) => {
   LocalStorage.save(TASKS.NEW, newTaskList.toString());
 
   toggleAddTaskFormVisibility($addTaskForm, $addTask, false);
+
+  new Notification("Lista de tareas", {
+    body: "Nueva tarea: " + task.title,
+  });
 });
 
 $addTask.addEventListener("click", function () {
@@ -210,6 +218,111 @@ const $tasks = document.querySelectorAll("task-element");
 
 $tasks.forEach(($task) => {
   $task.addEventListener("click", (event) =>
-    changeTabManagerContent(event, undefined, LMap, undefined)
+    changeTabManagerContent(
+      event,
+      { newTaskList, inProgressTaskList, completedTaskList },
+      undefined,
+      LMap,
+      undefined
+    )
   );
+});
+
+const $canvasElement = document.querySelector("canvas");
+
+const context = $canvasElement.getContext("2d");
+let initialX;
+let initialY;
+
+const dibujar = (x, y) => {
+  context.beginPath();
+  context.moveTo(initialX, initialY);
+  context.lineWidth = 5;
+  context.strokeStyle = "#000";
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.lineTo(x, y);
+  context.stroke();
+
+  initialX = x;
+  initialY = y;
+};
+
+const mouseDown = (event) => {
+  initialX = event.offsetX;
+  initialY = event.offsetY;
+  dibujar(initialX, initialY);
+  $canvasElement.addEventListener("mousemove", mouseMoving);
+};
+
+const mouseMoving = (event) => {
+  dibujar(event.offsetX, event.offsetY);
+};
+
+const mouseUp = () => {
+  $canvasElement.removeEventListener("mousemove", mouseMoving);
+};
+
+$canvasElement.addEventListener("mousedown", mouseDown);
+$canvasElement.addEventListener("mouse", mouseUp);
+
+const $clearCanvas = document.getElementById("clear-canvas");
+const $saveCanvas = document.getElementById("save-canvas");
+
+$clearCanvas.addEventListener("click", handleClearCanvas);
+$saveCanvas.addEventListener("click", handleSaveCanvas);
+
+function handleClearCanvas(event) {
+  const $canvas = document.querySelector("canvas");
+  const context = $canvas.getContext("2d");
+
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, $canvas.width, $canvas.height);
+  context.clearRect(0, 0, $canvas.width, $canvas.height);
+}
+
+function handleSaveCanvas(event) {
+  const $canvas = document.querySelector("canvas");
+  const imageData = $canvas.toDataURL("image/png");
+  const $tabManager = document.querySelector("tab-manager");
+  const taskId = $tabManager.getAttribute("task-id");
+  LocalStorage.save(`${taskId}-canvas`, imageData);
+}
+
+// a cada tarea le agrego los eventos de dragstart y drag end
+
+const $taskElements = document.querySelectorAll("task-element");
+
+$taskElements.forEach(($task) => {
+  addEventsDragStartDragEnd($task);
+});
+
+// para cada lista de tareas escucho el evento drop
+
+$taskListNew.addEventListener("drop", handleDropTask);
+$taskListInProgress.addEventListener("drop", handleDropTask);
+$taskListCompleted.addEventListener("drop", handleDropTask);
+
+// para cada lista de tareas escucho el evento de dragover
+
+$taskListNew.addEventListener("dragover", handleDragOverTask);
+$taskListInProgress.addEventListener("dragover", handleDragOverTask);
+$taskListCompleted.addEventListener("dragover", handleDragOverTask);
+
+// para cada lista de tareas escucho el evento dragleave
+
+$taskListNew.addEventListener("dragleave", handleDragLeaveTask);
+$taskListInProgress.addEventListener("dragleave", handleDragLeaveTask);
+$taskListCompleted.addEventListener("dragleave", handleDragLeaveTask);
+
+const $notificationElement = document.querySelector("notification-element");
+
+$notificationElement.addEventListener("click", () => {
+  if (!("Notification" in window)) {
+    console.log("Este navegador no admite notificaciones.");
+  } else {
+    Notification.requestPermission().then((permission) => {
+      $notificationElement.changeBtn(permission);
+    });
+  }
 });
