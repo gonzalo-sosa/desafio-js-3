@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:serve": "webpack serve --open --mode development",
-    "dev:watch": "webpack --mode development --watch",
-    "dev:build": "webpack --mode development",
-    "build": "webpack --mode production"
+    "dev:serve": "webpack serve --open --mode development --env NODE_ENV=development",
+    "dev:watch": "webpack --mode development --watch --env NODE_ENV=development",
+    "dev:build": "webpack --mode development --env NODE_ENV=development",
+    "build": "webpack --mode production --env NODE_ENV=production"
   },
   "keywords": [],
   "author": "",
@@ -29,11 +29,12 @@
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4",
+    "dotenv-webpack": "^8.1.0",
     "webpack-dev-server": "^5.1.0"
   },
   "dependencies": {
-    "leaflet": "^1.9.4",
     "crypto-browserify": "^3.12.1",
+    "leaflet": "^1.9.4",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0"
   }
