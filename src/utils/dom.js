@@ -310,17 +310,18 @@ export function changeTabManagerContent(
   }
 
   const $tabManager = document.querySelector("tab-manager");
-  const $details = $tabManager.querySelector("[tab-content-name=details]");
   const $canvas = $tabManager.querySelector("canvas");
 
   $tabManager.setAttribute("task-id", id);
 
   map.invalidateSize();
 
-  editContentToDetails($details, task);
-  editViewToMap(map, task);
-  addMarkerToMap(map, task);
-  editContentToCanvas($canvas, id);
+  if (task) {
+    editContentToDetails(details, $taskElement);
+    editViewToMap(map, $taskElement);
+    addMarkerToMap(map, task);
+    editContentToCanvas($canvas, id);
+  }
 }
 
 function editContentToDetails($details, task) {
@@ -337,7 +338,7 @@ function editContentToDetails($details, task) {
 }
 
 function editViewToMap(map, task) {
-  map.setView([task.latitude, task.longitude], 15);
+  map.setView(task.location, 15);
 }
 
 export var markers = {};
