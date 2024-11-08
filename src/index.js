@@ -28,6 +28,42 @@ const completedTaskList = new TaskList(
   LocalStorage.load(TASKS.COMPLETED, "[]")
 );
 
+// traer las tareas desde la conexión web socket si es que existen
+
+const ws = new WebSocket(`ws://${process.env.SERVER_IP}:${process.env.PORT}`);
+
+ws.onopen = (event) => {
+  console.log("Conectado al web socket");
+};
+
+ws.onmessage = (event) => {
+  console.log("Mensaje recibido: ", event);
+  const data = JSON.parse(event.data);
+  console.log(data);
+
+  // agregar las tareas a la lista correspondiente según su estado
+
+  switch (data.state) {
+    case STATES.NEW:
+      addTaskElementToListElement(data, $taskListNew);
+      break;
+    case STATES.IN_PROGRESS:
+      addTaskElementToListElement(data, $taskListInProgress);
+      break;
+    case STATES.COMPLETED:
+      addTaskElementToListElement(data, $taskListCompleted);
+      break;
+  }
+};
+
+ws.onerror = (event) => {
+  console.error(event);
+};
+
+ws.onclose = (event) => {
+  console.log("Conexión cerrada", event);
+};
+
 // Guardar tareas en local storage
 LocalStorage.save(TASKS.NEW, newTaskList.toString());
 LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
@@ -66,6 +102,7 @@ $addTaskForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const { title, description, dueDate } = getFormData(event);
+
   const [latitude, longitude] = await getPosition().then(
     (position) => position
   );
@@ -80,9 +117,34 @@ $addTaskForm.addEventListener("submit", async (event) => {
 
   toggleAddTaskFormVisibility($addTaskForm, $addTask, false);
 
+  // enviar datos a web socket del servidor node
+  // enviar desde el servidor node los datos a los cliente menos al actual
+
+  // TODO: detectar desde que ip se hace la conexión
+  // si la ip coincide con el servidor enviar al local
+  // si la ip no coincide con el servidor enviar al servidor
+
+  const ws = new WebSocket(`ws://${process.env.LOCAL_IP}:${process.env.PORT}`);
+
+  ws.onopen = (event) => {
+    console.log("Conectado al servidor WebSocket", event);
+
+    ws.send(JSON.stringify(task));
+  };
+
+  ws.onerror = (event) => {
+    console.log("Conexión WebSocket cerrada: ", event);
+  };
+
+  ws.onclose = () => {
+    console.log("Desconectado del servidor WebSocket");
+  };
+
   new Notification("Lista de tareas", {
     body: "Nueva tarea: " + task.title,
   });
+
+  //ws.close();
 });
 
 $addTask.addEventListener("click", function () {
@@ -221,9 +283,9 @@ $tasks.forEach(($task) => {
     changeTabManagerContent(
       event,
       { newTaskList, inProgressTaskList, completedTaskList },
-      undefined,
+      $details,
       LMap,
-      undefined
+      $canvas
     )
   );
 });
