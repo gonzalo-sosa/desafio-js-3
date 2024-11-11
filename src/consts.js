@@ -24,3 +24,18 @@ export const TASKS = {
   IN_PROGRESS: "tasks-in-progress",
   COMPLETED: "tasks-completed",
 };
+
+export const TAB_MANAGER_CONTENT = [
+  {
+    title: "Detalles de la Tarea",
+    description: "Edita los detalles de tu tarea aquí",
+  },
+  {
+    title: "Ubicación de la Tarea",
+    description: "Ver la ubicación en el mapa",
+  },
+  {
+    title: "Área de Dibujo",
+    description: "Dibuja algo relacionado con tu tarea",
+  },
+];
