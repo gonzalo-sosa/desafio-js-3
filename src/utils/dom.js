@@ -8,7 +8,12 @@ export function addContentToDetails(details) {
   $gridContainer.classList.add("grid", "w-full", "items-center", "gap-4");
 
   const $titleFieldContainer = document.createElement("div");
-  $titleFieldContainer.classList.add("flex", "flex-col", "space-y-1.5");
+  $titleFieldContainer.classList.add(
+    "flex",
+    "flex-row",
+    "gap-1",
+    "items-center"
+  );
   const $titleInput = document.createElement("input");
   $titleInput.type = "text";
   $titleInput.id = "title";
@@ -41,8 +46,40 @@ export function addContentToDetails(details) {
   );
   $titleFieldContainer.appendChild($titleInput);
 
+  // Botón para copiar el título
+  const $titleCopyButton = document.createElement("button");
+  $titleCopyButton.type = "button";
+  $titleCopyButton.textContent = "Copiar";
+  $titleCopyButton.classList.add(
+    "btn",
+    "btn-copy",
+    "text-xs",
+    "py-1",
+    "px-2",
+    "rounded-md",
+    "bg-blue-500",
+    "text-white",
+    "hover:bg-blue-600"
+  );
+  $titleCopyButton.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText($titleInput.value)
+      .then(() => {
+        console.log("Título copiado al portapapeles");
+      })
+      .catch((err) => {
+        console.error("Error al copiar al portapapeles: ", err);
+      });
+  });
+  $titleFieldContainer.appendChild($titleCopyButton);
+
   const $descriptionFieldContainer = document.createElement("div");
-  $descriptionFieldContainer.classList.add("flex", "flex-col", "space-y-1.5");
+  $descriptionFieldContainer.classList.add(
+    "flex",
+    "flex-row",
+    "gap-1",
+    "items-center"
+  );
   const $descriptionTextarea = document.createElement("textarea");
   $descriptionTextarea.id = "description";
   $descriptionTextarea.name = "description";
@@ -69,13 +106,70 @@ export function addContentToDetails(details) {
   );
   $descriptionFieldContainer.appendChild($descriptionTextarea);
 
+  const $descriptionCopyButton = document.createElement("button");
+  $descriptionCopyButton.type = "button";
+  $descriptionCopyButton.textContent = "Copiar";
+  $descriptionCopyButton.classList.add(
+    "btn",
+    "btn-copy",
+    "text-xs",
+    "py-1",
+    "px-2",
+    "rounded-md",
+    "bg-blue-500",
+    "text-white",
+    "hover:bg-blue-600"
+  );
+  $descriptionCopyButton.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText($descriptionTextarea.value)
+      .then(() => {
+        console.log("Descripción copiada al portapapeles");
+      })
+      .catch((err) => {
+        console.error("Error al copiar al portapapeles: ", err);
+      });
+  });
+  $descriptionFieldContainer.appendChild($descriptionCopyButton);
+
   const $dueDateFieldContainer = document.createElement("div");
-  $dueDateFieldContainer.classList.add("grid", "gap-1.5");
+  $dueDateFieldContainer.classList.add(
+    "flex",
+    "flex-row",
+    "items-center",
+    "gap-1.5"
+  );
   const $dueDateInput = document.createElement("input");
   $dueDateInput.type = "date";
   $dueDateInput.id = "due-date";
   $dueDateInput.name = "due-date";
   $dueDateFieldContainer.appendChild($dueDateInput);
+
+  const $dueDateCopyButton = document.createElement("button");
+  $dueDateCopyButton.type = "button";
+  $dueDateCopyButton.textContent = "Copiar";
+  $dueDateCopyButton.classList.add(
+    "btn",
+    "btn-copy",
+    "text-xs",
+    "py-1",
+    "px-2",
+    "rounded-md",
+    "bg-blue-500",
+    "text-white",
+    "hover:bg-blue-600"
+  );
+  $dueDateCopyButton.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText($dueDateInput.value)
+      .then(() => {
+        console.log("Fecha de vencimiento copiada al portapapeles");
+      })
+      .catch((err) => {
+        console.error("Error al copiar al portapapeles: ", err);
+      });
+  });
+  $dueDateFieldContainer.appendChild($dueDateCopyButton);
 
   $gridContainer.appendChild($titleFieldContainer);
   $gridContainer.appendChild($descriptionFieldContainer);

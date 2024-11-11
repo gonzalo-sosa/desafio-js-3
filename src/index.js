@@ -35,8 +35,6 @@ worker.postMessage("get_tasks");
 worker.onmessage = (e) => {
   const { data } = e;
 
-  console.log(e);
-
   if (data) {
     const task = data.task;
 
