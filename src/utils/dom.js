@@ -1,5 +1,5 @@
 import { TaskElement } from "../components";
-import { STATES } from "../consts";
+import * as L from "leaflet";
 
 export function addContentToDetails(details) {
   const $form = document.createElement("form");
@@ -107,17 +107,15 @@ export function addContentToMap(map) {
   $mapContainer.innerHTML = icon;
   $mapContainer.appendChild(mapText);
 
-  const LMap = createMap($mapContainer);
+  window.LMap = createMap($mapContainer);
 
   map.target.appendChild($mapContainer);
 
-  LMap.invalidateSize();
-
-  return LMap;
+  window.LMap.invalidateSize();
 }
 
 function createMap(container, latitude = -34.61315, longitude = -58.67723) {
-  const lMap = L.map(container, {}).setView([latitude, longitude], 13, {
+  const map = L.map(container, {}).setView([latitude, longitude], 13, {
     animate: true,
   });
 
@@ -126,9 +124,9 @@ function createMap(container, latitude = -34.61315, longitude = -58.67723) {
     maxZoom: 20,
     attribution:
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  }).addTo(lMap);
+  }).addTo(map);
 
-  return lMap;
+  return map;
 }
 
 export function addContentToCanvas(canvas) {
@@ -278,80 +276,69 @@ export function createTaskElement(task) {
   );
 
   addEventsDragStartDragEnd($taskElement);
+  addEventChangeTabManagerContent($taskElement);
 
   return $taskElement;
 }
 
-export function changeTabManagerContent(
-  event,
-  { newTaskList, inProgressTaskList, completedTaskList },
-  details,
-  map,
-  canvas
-) {
+function addEventChangeTabManagerContent(task) {
+  task.addEventListener("click", (event) => changeTabManagerContent(event));
+}
+
+export function changeTabManagerContent(event) {
   const $taskElement = event.target;
-  const state = $taskElement.getAttribute("state");
   const id = $taskElement.getAttribute("id");
 
-  // busco el task con las listas
-  let task = null;
-  switch (state) {
-    case STATES.NEW:
-      task = newTaskList.getTaskById(id);
-      break;
-
-    case STATES.IN_PROGRESS:
-      task = inProgressTaskList.getTaskById(id);
-      break;
-
-    case STATES.COMPLETED:
-      task = completedTaskList.getTaskById(id);
-      break;
-  }
-
   const $tabManager = document.querySelector("tab-manager");
-  const $canvas = $tabManager.querySelector("canvas");
+  const $details = document.querySelector("[tab-content-name=details]");
+  const $canvas = document.querySelector("[tab-content-name=canvas]");
 
   $tabManager.setAttribute("task-id", id);
 
-  map.invalidateSize();
-
-  if (task) {
-    editContentToDetails(details, $taskElement);
-    editViewToMap(map, $taskElement);
-    addMarkerToMap(map, task);
-    editContentToCanvas($canvas, id);
+  if ($taskElement) {
+    editContentToDetails($details, $taskElement);
+    editContentToMap($taskElement);
+    editContentToCanvas($canvas, $taskElement);
   }
 }
 
-function editContentToDetails($details, task) {
+function editContentToDetails($details, $taskElement) {
   const $title = $details.querySelector("[name=title]");
   const $description = $details.querySelector("[name=description");
   const $dueDate = $details.querySelector("[name=due-date]");
 
-  $title.setAttribute("value", task.title);
-  $description.value = task.description ?? "";
+  $title.setAttribute("value", $taskElement.title);
+  $description.value = $taskElement.description ?? "";
   $dueDate.setAttribute(
     "value",
-    new Date(task.dueDate).toISOString().split("T")[0]
+    new Date($taskElement.dueDate).toISOString().split("T")[0]
   );
 }
 
-function editViewToMap(map, task) {
-  map.setView(task.location, 15);
+function editContentToMap($taskElement) {
+  editViewToMap($taskElement);
+  addMarkerToMap($taskElement);
+}
+
+function editViewToMap($taskElement) {
+  window.LMap.setView($taskElement.location, 15);
 }
 
 export var markers = {};
 
-function addMarkerToMap(map, task) {
-  if (!markers[task.id]) {
-    L.marker([task.latitude, task.longitude]).addTo(map);
-    markers[`${task.id}`] = true;
+function addMarkerToMap($taskElement) {
+  const id = $taskElement.getAttribute("id");
+
+  if (!markers[id]) {
+    L.marker($taskElement.location).addTo(window.LMap);
+    markers[`${id}`] = true;
   }
 }
 
-function editContentToCanvas(canvas, id) {
+function editContentToCanvas($canvas, $taskElement) {
   // traer de local storage sino dejarlo como estaba
+  const canvas = $canvas.querySelector("canvas");
+  const id = $taskElement.getAttribute("id");
   const canvasData = localStorage.getItem(`${id}-canvas`);
   if (canvasData) {
     let img = new Image();
@@ -382,7 +369,7 @@ function handleDragStart(event) {
   sourceContainer = draggedElement.parentNode;
 }
 
-function handleDragEnd(event) {
+function handleDragEnd() {
   draggedElement = null;
   sourceContainer = null;
 }
@@ -415,5 +402,5 @@ export function handleDragOverTask(event) {
 }
 
 export function handleDragLeaveTask(event) {
-  console.log("DRAG LEAVE");
+  console.log("DRAG LEAVE", event);
 }
