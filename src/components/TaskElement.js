@@ -16,7 +16,9 @@ export class TaskElement extends HTMLElement {
     this.title = title ?? this.getAttribute("title");
     this.description = description ?? this.getAttribute("description");
     this.dueDate = dueDate
-      ? new Date(dueDate)
+      ? dueDate instanceof Date
+        ? dueDate
+        : new Date(dueDate)
       : new Date(this.getAttribute("due-date"));
     this.location = location ?? [
       this.getAttribute("latitude"),
@@ -96,7 +98,9 @@ export class TaskElement extends HTMLElement {
         <button class="task__btn"><popover-element open="false"></popover-element></button>
         <div class="task__data">
           <span class="task__title">${this.title}</span>
-          <span class="task__dueDate">Vencimiento: ${this.dueDate.toLocaleDateString()}</span>
+          <span class="task__dueDate">Vencimiento: ${
+            this.dueDate.toISOString().split("T")[0]
+          }</span>
         </div>
         <button class="task__delete">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="7px"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
