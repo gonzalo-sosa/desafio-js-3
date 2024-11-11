@@ -1,9 +1,9 @@
 import "./styles/main.css";
 
 import { Task, TaskList, LocalStorage } from "./modules/index";
-import { STATES, TASKS } from "./consts";
+import { STATES, TAB_MANAGER_CONTENT, TASKS } from "./consts";
 import { getPosition } from "./services/location";
-import { TabContent, TabManager, TaskElement } from "./components/index";
+import { TabContent, TabManager } from "./components/index";
 import {
   getFormData,
   addContentToCanvas,
@@ -11,13 +11,11 @@ import {
   addContentToMap,
   addTaskElementToListElement,
   toggleAddTaskFormVisibility,
-  changeTabManagerContent,
   handleDropTask,
   handleDragOverTask,
   handleDragLeaveTask,
   addEventsDragStartDragEnd,
 } from "./utils/dom";
-import * as L from "leaflet";
 
 // Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
@@ -28,12 +26,11 @@ const completedTaskList = new TaskList(
   LocalStorage.load(TASKS.COMPLETED, "[]")
 );
 
-// traer las tareas desde la conexión web socket si es que existen
-
+// Traer las tareas desde la conexión web socket si es que existen
 const ws = new WebSocket(`ws://${process.env.SERVER_IP}:${process.env.PORT}`);
 
 ws.onopen = (event) => {
-  console.log("Conectado al web socket");
+  console.log("Conectado al web socket", event);
 };
 
 ws.onmessage = (event) => {
@@ -78,21 +75,17 @@ const $taskListCompleted = document.getElementById("tasksCompleted");
 const $addTask = document.getElementById("addTaskBtn");
 const $addTaskForm = document.getElementById("addTaskForm");
 
-// Cargar tareas
-if (newTaskList.getTasks().length > 0)
-  newTaskList.getTasks().forEach((task) => {
-    addTaskElementToListElement(task, $taskListNew);
-  });
+// Crear tareas
+createTasks(newTaskList.getTasks(), $taskListNew);
+createTasks(inProgressTaskList.getTasks(), $taskListInProgress);
+createTasks(completedTaskList.getTasks(), $taskListCompleted);
 
-if (inProgressTaskList.getTasks().length > 0)
-  inProgressTaskList.getTasks().forEach((task) => {
-    addTaskElementToListElement(task, $taskListInProgress);
-  });
-
-if (completedTaskList.getTasks().length > 0)
-  completedTaskList.getTasks().forEach((task) => {
-    addTaskElementToListElement(task, $taskListCompleted);
-  });
+function createTasks(tasks, target) {
+  if (Array.isArray(tasks) && tasks.length > 0)
+    tasks.forEach((task) => {
+      addTaskElementToListElement(task, target);
+    });
+}
 
 // Agregar lista de tareas al sidebar
 $sidebar.appendChild($taskList);
@@ -179,7 +172,7 @@ document.addEventListener("state-changed", (event) => {
 
   task.state = state;
 
-  // Remueve el elemento del DOM
+  // Quitar el elemento del DOM
   const taskElement = document.querySelector(`task-element[id="${id}"]`);
   if (taskElement) {
     taskElement.remove();
@@ -233,62 +226,37 @@ document.addEventListener("task-deleted", (event) => {
   LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 });
 
-const $main = document.getElementById("main");
-const $tabManager = new TabManager();
-const tabs = $tabManager.tabs;
+function createTabManager() {
+  const $main = document.getElementById("main");
+  const $tabManager = new TabManager();
+  const tabs = $tabManager.tabs;
 
-const CONTENTS = [
-  {
-    title: "Detalles de la Tarea",
-    description: "Edita los detalles de tu tarea aquí",
-  },
-  {
-    title: "Ubicación de la Tarea",
-    description: "Ver la ubicación en el mapa",
-  },
-  {
-    title: "Área de Dibujo",
-    description: "Dibuja algo relacionado con tu tarea",
-  },
-];
+  const $tabsContent = tabs.map((tab, i) => {
+    const $tabContent = new TabContent(
+      tab,
+      TAB_MANAGER_CONTENT[i].title,
+      TAB_MANAGER_CONTENT[i].description
+    );
 
-const $tabsContent = tabs.map((tab, i) => {
-  const $tabContent = new TabContent(
-    tab,
-    CONTENTS[i].title,
-    CONTENTS[i].description
+    return $tabContent;
+  });
+
+  $tabsContent.forEach(($tabContent) =>
+    $tabManager.container.appendChild($tabContent)
   );
 
-  return $tabContent;
-});
+  $main.appendChild($tabManager);
+}
 
-$tabsContent.forEach(($tabContent) =>
-  $tabManager.container.appendChild($tabContent)
-);
-
-$main.appendChild($tabManager);
+createTabManager();
 
 const $details = document.querySelector("[tab-content-name=details]");
 const $map = document.querySelector("[tab-content-name=map]");
 const $canvas = document.querySelector("[tab-content-name=canvas]");
 
 addContentToDetails($details);
-const LMap = addContentToMap($map);
+addContentToMap($map);
 addContentToCanvas($canvas);
-
-const $tasks = document.querySelectorAll("task-element");
-
-$tasks.forEach(($task) => {
-  $task.addEventListener("click", (event) =>
-    changeTabManagerContent(
-      event,
-      { newTaskList, inProgressTaskList, completedTaskList },
-      $details,
-      LMap,
-      $canvas
-    )
-  );
-});
 
 const $canvasElement = document.querySelector("canvas");
 
@@ -334,7 +302,7 @@ const $saveCanvas = document.getElementById("save-canvas");
 $clearCanvas.addEventListener("click", handleClearCanvas);
 $saveCanvas.addEventListener("click", handleSaveCanvas);
 
-function handleClearCanvas(event) {
+function handleClearCanvas() {
   const $canvas = document.querySelector("canvas");
   const context = $canvas.getContext("2d");
 
@@ -343,7 +311,7 @@ function handleClearCanvas(event) {
   context.clearRect(0, 0, $canvas.width, $canvas.height);
 }
 
-function handleSaveCanvas(event) {
+function handleSaveCanvas() {
   const $canvas = document.querySelector("canvas");
   const imageData = $canvas.toDataURL("image/png");
   const $tabManager = document.querySelector("tab-manager");
