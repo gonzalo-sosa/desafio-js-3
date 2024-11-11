@@ -1,7 +1,6 @@
 import { STATES, STATES_COLOR, STATES_LABEL } from "../consts";
-import { PopoverElement } from "./PopoverElement";
-import { StateIconElement } from "./StateIconElement";
-import * as L from "leaflet";
+// eslint-disable-next-line no-unused-vars
+import { PopoverElement, StateIconElement } from "./index";
 
 export class TaskElement extends HTMLElement {
   static get observedAttributes() {
@@ -16,7 +15,9 @@ export class TaskElement extends HTMLElement {
     this.id = id ?? this.getAttribute("id");
     this.title = title ?? this.getAttribute("title");
     this.description = description ?? this.getAttribute("description");
-    this.dueDate = new Date(dueDate) ?? new Date(this.getAttribute("due-date"));
+    this.dueDate = dueDate
+      ? new Date(dueDate)
+      : new Date(this.getAttribute("due-date"));
     this.location = location ?? [
       this.getAttribute("latitude"),
       this.getAttribute("longitude"),

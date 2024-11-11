@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { TabButton } from "./TabButton.js";
 import { TabContent } from "./TabContent.js";
 
