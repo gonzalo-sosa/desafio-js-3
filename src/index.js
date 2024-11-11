@@ -124,7 +124,7 @@ $addTaskForm.addEventListener("submit", async (event) => {
   // si la ip coincide con el servidor enviar al local
   // si la ip no coincide con el servidor enviar al servidor
 
-  const ws = new WebSocket(`ws://${process.env.LOCAL_IP}:${process.env.PORT}`);
+  const ws = new WebSocket(`ws://${process.env.SERVER_IP}:${process.env.PORT}`);
 
   ws.onopen = (event) => {
     console.log("Conectado al servidor WebSocket", event);
