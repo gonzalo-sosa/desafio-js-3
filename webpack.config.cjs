@@ -5,6 +5,7 @@ const path = require("path");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 module.exports = (env) => {
   const isProduction = env.NODE_ENV === "production";
@@ -86,6 +87,16 @@ module.exports = (env) => {
       new NodePolyfillPlugin(),
       new Dotenv({
         path: dotenvFilename,
+      }),
+      new ESLintPlugin({
+        overrideConfigFile: path.resolve(__dirname, "eslint.config.mjs"),
+        configType: "flat",
+        exclude: ["node_modules", "dist"],
+        threads: true,
+        extensions: ["js"],
+        emitWarning: true,
+        failOnWarning: false,
+        failOnError: true,
       }),
     ],
   };
