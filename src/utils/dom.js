@@ -149,13 +149,7 @@ export function addContentToCanvas(canvas) {
   $canvas.height = 100;
 
   $drawingAreaContainer.appendChild($canvas);
-  /*
-  const $drawingAreaText = document.createElement("span");
-  $drawingAreaText.classList.add("ml-2");
-  $drawingAreaText.textContent = "Área de dibujo";
 
-  $drawingAreaContainer.appendChild($drawingAreaText);
-  */
   canvas.target.appendChild($drawingAreaContainer);
 
   const $buttonsContainer = document.createElement("div");
@@ -340,6 +334,7 @@ function editContentToCanvas($canvas, $taskElement) {
   const canvas = $canvas.querySelector("canvas");
   const id = $taskElement.getAttribute("id");
   const canvasData = localStorage.getItem(`${id}-canvas`);
+
   if (canvasData) {
     let img = new Image();
     img.onload = function () {

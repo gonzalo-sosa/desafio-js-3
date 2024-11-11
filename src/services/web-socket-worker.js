@@ -14,7 +14,7 @@ function connectWebSocket() {
     console.log("Conectado al servidor WebSocket");
     // Enviar todos los mensajes pendientes en la cola
     while (messageQueue.length > 0) {
-      const pendingMessage = messageQueue.shift(); // Extraemos el primer mensaje de la cola
+      const pendingMessage = messageQueue.shift();
       sendWebSocketMessage(pendingMessage);
     }
   };
@@ -58,7 +58,6 @@ function sendWebSocketMessage(message) {
 onmessage = function (e) {
   const task = e.data;
 
-  // Si no tenemos WebSocket, nos conectamos
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     connectWebSocket();
   }

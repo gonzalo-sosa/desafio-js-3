@@ -26,39 +26,35 @@ const completedTaskList = new TaskList(
   LocalStorage.load(TASKS.COMPLETED, "[]")
 );
 
-// Traer las tareas desde la conexión web socket si es que existen
-const ws = new WebSocket(`ws://${process.env.SERVER_IP}:${process.env.PORT}`);
+const worker = new Worker(
+  new URL("./services/web-socket-worker.js", import.meta.url)
+);
 
-ws.onopen = (event) => {
-  console.log("Conectado al web socket", event);
-};
+worker.postMessage("get_tasks");
 
-ws.onmessage = (event) => {
-  console.log("Mensaje recibido: ", event);
-  const data = JSON.parse(event.data);
-  console.log(data);
+worker.onmessage = (e) => {
+  const { data } = e;
 
-  // agregar las tareas a la lista correspondiente según su estado
+  console.log(e);
 
-  switch (data.state) {
-    case STATES.NEW:
-      addTaskElementToListElement(data, $taskListNew);
-      break;
-    case STATES.IN_PROGRESS:
-      addTaskElementToListElement(data, $taskListInProgress);
-      break;
-    case STATES.COMPLETED:
-      addTaskElementToListElement(data, $taskListCompleted);
-      break;
+  if (data) {
+    const task = data.task;
+
+    switch (task._state) {
+      case STATES.NEW:
+        addTaskElementToListElement(task, $taskListNew);
+        break;
+      case STATES.IN_PROGRESS:
+        addTaskElementToListElement(task, $taskListInProgress);
+        break;
+      case STATES.COMPLETED:
+        addTaskElementToListElement(task, $taskListCompleted);
+        break;
+      default:
+        console.log("Estado de tarea desconocido", task.state);
+        break;
+    }
   }
-};
-
-ws.onerror = (event) => {
-  console.error(event);
-};
-
-ws.onclose = (event) => {
-  console.log("Conexión cerrada", event);
 };
 
 // Guardar tareas en local storage
@@ -110,33 +106,33 @@ $addTaskForm.addEventListener("submit", async (event) => {
 
   toggleAddTaskFormVisibility($addTaskForm, $addTask, false);
 
-  // enviar datos a web socket del servidor node
-  // enviar desde el servidor node los datos a los cliente menos al actual
+  // usar worker
+  if (window.Worker) {
+    const wsWorker = new Worker(
+      new URL("./services/web-socket-worker.js", import.meta.url)
+    );
 
-  // TODO: detectar desde que ip se hace la conexión
-  // si la ip coincide con el servidor enviar al local
-  // si la ip no coincide con el servidor enviar al servidor
+    wsWorker.postMessage(task);
 
-  const ws = new WebSocket(`ws://${process.env.SERVER_IP}:${process.env.PORT}`);
+    wsWorker.onmessage = (e) => {
+      const { data } = e;
+      if (data.type === "TASK_SENT")
+        console.log("Tarea enviada correctamente: ", { ...data });
+      else console.log("Tarea enviada incorrectamente.");
+    };
 
-  ws.onopen = (event) => {
-    console.log("Conectado al servidor WebSocket", event);
+    const notificationWorker = new Worker(
+      new URL("./services/notification-worker.js", import.meta.url)
+    );
 
-    ws.send(JSON.stringify(task));
-  };
-
-  ws.onerror = (event) => {
-    console.log("Conexión WebSocket cerrada: ", event);
-  };
-
-  ws.onclose = () => {
-    console.log("Desconectado del servidor WebSocket");
-  };
-
-  new Notification("Lista de tareas", {
-    body: "Nueva tarea: " + task.title,
-  });
-
+    notificationWorker.postMessage(task);
+  } else {
+    new Notification("Lista de tareas", {
+      body: `Nueva tarea ${
+        task.title
+      } con expiración el ${task.dueDate.toLocaleString()}`,
+    });
+  }
   //ws.close();
 });
 
@@ -259,8 +255,8 @@ addContentToMap($map);
 addContentToCanvas($canvas);
 
 const $canvasElement = document.querySelector("canvas");
-
 const context = $canvasElement.getContext("2d");
+
 let initialX;
 let initialY;
 
