@@ -2,14 +2,14 @@ export class TabContent extends HTMLElement {
   constructor(tabName, title, description) {
     super();
     this.tabName = tabName;
-    this.title = title ?? "";
-    this.description = description ?? "";
+    this.title = title ?? '';
+    this.description = description ?? '';
 
-    this.setAttribute("tab-content-name", this.tabName);
+    this.setAttribute('tab-content-name', this.tabName);
 
     this.render();
 
-    this.target = this.querySelector(".target");
+    this.target = this.querySelector('.target');
   }
 
   render() {
@@ -27,4 +27,4 @@ export class TabContent extends HTMLElement {
     `;
   }
 }
-customElements.define("tab-content", TabContent);
+customElements.define('tab-content', TabContent);

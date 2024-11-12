@@ -4,7 +4,7 @@
 onmessage = function (e) {
   const { title, dueDate } = e.data;
 
-  new Notification("Lista de tareas", {
+  new Notification('Lista de tareas', {
     body: `Nueva tarea ${title} con expiración el ${dueDate.toLocaleString()}`,
   });
 };

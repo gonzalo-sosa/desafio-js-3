@@ -1,20 +1,16 @@
-/* eslint-disable no-unused-vars */
-import { TabButton } from "./TabButton.js";
-import { TabContent } from "./TabContent.js";
-
-export const TABS_DEFAULT = ["details", "map", "canvas"];
+export const TABS_DEFAULT = ['details', 'map', 'canvas'];
 
 export class TabManager extends HTMLElement {
   constructor(tabs) {
     super();
     this.tabs = tabs ?? TABS_DEFAULT;
-    this.currentTab = this.getAttribute("currentTab") ?? this.tabs[0];
-    this.setAttribute("currentTab", this.currentTab);
+    this.currentTab = this.getAttribute('currentTab') ?? this.tabs[0];
+    this.setAttribute('currentTab', this.currentTab);
 
     this.render();
     this.addEventListeners();
 
-    this.container = this.querySelector("div");
+    this.container = this.querySelector('div');
   }
 
   render() {
@@ -23,16 +19,16 @@ export class TabManager extends HTMLElement {
         <div class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground;">
           ${this.tabs
             .map((tab) => `<tab-button tab-name="${tab}"></tab-button>`)
-            .join("")}
+            .join('')}
         </div>
       </div>
     `;
   }
 
   addEventListeners() {
-    const buttons = this.querySelectorAll("tab-button");
+    const buttons = this.querySelectorAll('tab-button');
     buttons.forEach((button) => {
-      button.addEventListener("click", this.handleTabClick.bind(this));
+      button.addEventListener('click', this.handleTabClick.bind(this));
     });
   }
 
@@ -42,14 +38,14 @@ export class TabManager extends HTMLElement {
   }
 
   updateTabVisibility() {
-    const contents = this.querySelectorAll("tab-content");
+    const contents = this.querySelectorAll('tab-content');
     contents.forEach((content) => {
       content.style.display =
-        content.tabName === this.currentTab ? "block" : "none";
+        content.tabName === this.currentTab ? 'block' : 'none';
     });
-    const buttons = this.querySelectorAll("tab-button");
+    const buttons = this.querySelectorAll('tab-button');
     buttons.forEach((button) => {
-      button.classList.toggle("active", button.value === this.currentTab);
+      button.classList.toggle('active', button.value === this.currentTab);
     });
   }
 
@@ -57,4 +53,4 @@ export class TabManager extends HTMLElement {
     this.updateTabVisibility();
   }
 }
-customElements.define("tab-manager", TabManager);
+customElements.define('tab-manager', TabManager);

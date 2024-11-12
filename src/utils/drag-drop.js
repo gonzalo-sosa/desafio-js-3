@@ -2,8 +2,8 @@ export var draggedElement = null;
 export var sourceContainer = null;
 
 export function addEventsDragStartDragEnd(target) {
-  target.addEventListener("dragstart", handleDragStart);
-  target.addEventListener("dragend", handleDragEnd);
+  target.addEventListener('dragstart', handleDragStart);
+  target.addEventListener('dragend', handleDragEnd);
 }
 
 function handleDragStart(event) {
@@ -17,7 +17,7 @@ function handleDragEnd() {
 }
 
 export function handleDropTask(event) {
-  console.log("DROP");
+  console.log('DROP');
   event.preventDefault();
 
   let { target } = event;
@@ -26,7 +26,7 @@ export function handleDropTask(event) {
     return;
   }
 
-  if (target.parentNode.getAttribute("id") !== "taskList") {
+  if (target.parentNode.getAttribute('id') !== 'taskList') {
     target = target.parentNode;
   }
 
@@ -35,7 +35,7 @@ export function handleDropTask(event) {
 
     target.appendChild(draggedElement);
 
-    draggedElement.updateState(target.getAttribute("state"));
+    draggedElement.updateState(target.getAttribute('state'));
   }
 }
 
@@ -44,5 +44,5 @@ export function handleDragOverTask(event) {
 }
 
 export function handleDragLeaveTask(event) {
-  console.log("DRAG LEAVE", event);
+  console.log('DRAG LEAVE', event);
 }

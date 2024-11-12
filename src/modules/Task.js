@@ -1,13 +1,13 @@
-import { STATES } from "../consts";
-import { createUUID } from "../utils/generator";
-import { isString } from "../utils/validator";
+import { STATES } from '../consts';
+import { createUUID } from '../utils/generator';
+import { isString } from '../utils/validator';
 
 export class Task {
   constructor(title, description, dueDate, latitude, longitude) {
     if (!title || !isString(title))
-      throw new Error("Título es requerido y debe ser string.");
+      throw new Error('Título es requerido y debe ser string.');
     if (!description || !isString(description))
-      throw new Error("Título es requerido y debe ser string.");
+      throw new Error('Título es requerido y debe ser string.');
 
     this._id = createUUID();
     this.title = title;

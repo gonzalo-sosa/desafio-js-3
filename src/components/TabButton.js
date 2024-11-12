@@ -2,7 +2,7 @@ export class TabButton extends HTMLElement {
   constructor() {
     super();
 
-    this.tabName = this.getAttribute("tab-name");
+    this.tabName = this.getAttribute('tab-name');
     this.render();
   }
 
@@ -21,4 +21,4 @@ export class TabButton extends HTMLElement {
   }
 }
 
-customElements.define("tab-button", TabButton);
+customElements.define('tab-button', TabButton);

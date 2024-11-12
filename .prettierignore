@@ -1,0 +1,9 @@
+build/
+
+**/*.html
+
+**/*.md
+**/*.yaml
+**/*.mjs
+**/*.cjs
+**/*.config.*

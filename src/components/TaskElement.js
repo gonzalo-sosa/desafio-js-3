@@ -1,30 +1,30 @@
-import { STATES, STATES_COLOR, STATES_LABEL } from "../consts";
+import { STATES, STATES_COLOR, STATES_LABEL } from '../consts';
 // eslint-disable-next-line no-unused-vars
-import { PopoverElement, StateIconElement } from "./index";
+import { PopoverElement, StateIconElement } from './index';
 
 export class TaskElement extends HTMLElement {
   static get observedAttributes() {
-    return ["state"];
+    return ['state'];
   }
 
   constructor(id, title, description, dueDate, location, state) {
     super();
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({ mode: 'open' });
 
     // Propiedades
-    this.id = id ?? this.getAttribute("id");
-    this.title = title ?? this.getAttribute("title");
-    this.description = description ?? this.getAttribute("description");
+    this.id = id ?? this.getAttribute('id');
+    this.title = title ?? this.getAttribute('title');
+    this.description = description ?? this.getAttribute('description');
     this.dueDate = dueDate
       ? dueDate instanceof Date
         ? dueDate
         : new Date(dueDate)
-      : new Date(this.getAttribute("due-date"));
+      : new Date(this.getAttribute('due-date'));
     this.location = location ?? [
-      this.getAttribute("latitude"),
-      this.getAttribute("longitude"),
+      this.getAttribute('latitude'),
+      this.getAttribute('longitude'),
     ];
-    this.state = (state || this.getAttribute("state")) ?? STATES.NEW;
+    this.state = (state || this.getAttribute('state')) ?? STATES.NEW;
     this.btnColor = STATES_COLOR[this.state];
 
     // drag y drop
@@ -99,7 +99,7 @@ export class TaskElement extends HTMLElement {
         <div class="task__data">
           <span class="task__title">${this.title}</span>
           <span class="task__dueDate">Vencimiento: ${
-            this.dueDate.toISOString().split("T")[0]
+            this.dueDate.toISOString().split('T')[0]
           }</span>
         </div>
         <button class="task__delete">
@@ -110,36 +110,36 @@ export class TaskElement extends HTMLElement {
   }
 
   initElements() {
-    this.$task = this.shadowRoot.querySelector(".task");
-    this.$btnState = this.$task.querySelector(".task__btn");
-    this.$popover = this.$task.querySelector("popover-element");
-    this.$btnDelete = this.$task.querySelector(".task__delete");
+    this.$task = this.shadowRoot.querySelector('.task');
+    this.$btnState = this.$task.querySelector('.task__btn');
+    this.$popover = this.$task.querySelector('popover-element');
+    this.$btnDelete = this.$task.querySelector('.task__delete');
   }
 
   bindEvents() {
-    this.$btnState.addEventListener("click", () =>
+    this.$btnState.addEventListener('click', () =>
       this.$popover.togglePopover()
     );
 
-    this.$btnDelete.addEventListener("click", this.handleDelete.bind(this));
+    this.$btnDelete.addEventListener('click', this.handleDelete.bind(this));
     this.createStateList();
   }
 
   createStateList() {
-    const $list = document.createElement("ul");
-    $list.classList.add("state-list");
+    const $list = document.createElement('ul');
+    $list.classList.add('state-list');
 
     for (const state in STATES) {
-      const $listItem = document.createElement("li");
-      const $btn = document.createElement("button");
+      const $listItem = document.createElement('li');
+      const $btn = document.createElement('button');
       const $stateIcon = `<state-icon-element color="${STATES_COLOR[state]}"></state-icon-element>`;
 
       $btn.textContent = STATES_LABEL[state];
-      $btn.addEventListener("click", () => {
+      $btn.addEventListener('click', () => {
         this.updateState(state);
       });
 
-      $btn.insertAdjacentHTML("afterbegin", $stateIcon);
+      $btn.insertAdjacentHTML('afterbegin', $stateIcon);
       $listItem.append($btn);
       $list.appendChild($listItem);
     }
@@ -148,12 +148,12 @@ export class TaskElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.setAttribute("description", this.description);
-    this.setAttribute("state", this.state);
+    this.setAttribute('description', this.description);
+    this.setAttribute('state', this.state);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "state" && oldValue !== newValue) {
+    if (name === 'state' && oldValue !== newValue) {
       this.state = newValue;
       this.updateBtn(STATES_COLOR[newValue]); // Actualiza el color del botón si cambia el estado
       this.handleChangeState();
@@ -162,7 +162,7 @@ export class TaskElement extends HTMLElement {
 
   updateState(state) {
     this.state = state;
-    this.setAttribute("state", state);
+    this.setAttribute('state', state);
   }
 
   updateBtn(color) {
@@ -171,7 +171,7 @@ export class TaskElement extends HTMLElement {
 
   handleChangeState() {
     this.dispatchEvent(
-      new CustomEvent("state-changed", {
+      new CustomEvent('state-changed', {
         detail: { id: this.id, state: this.state },
         bubbles: true,
         composed: true,
@@ -181,7 +181,7 @@ export class TaskElement extends HTMLElement {
 
   handleDelete() {
     this.dispatchEvent(
-      new CustomEvent("task-deleted", {
+      new CustomEvent('task-deleted', {
         detail: { id: this.id },
         bubbles: true,
         composed: true,
@@ -191,9 +191,9 @@ export class TaskElement extends HTMLElement {
   }
 
   disconnectedCallback() {
-    this.$btnState.removeEventListener("click", this.$popover.togglePopover());
-    this.$btnDelete.removeEventListener("click", this.handleDelete);
+    this.$btnState.removeEventListener('click', this.$popover.togglePopover());
+    this.$btnDelete.removeEventListener('click', this.handleDelete);
   }
 }
 
-customElements.define("task-element", TaskElement);
+customElements.define('task-element', TaskElement);

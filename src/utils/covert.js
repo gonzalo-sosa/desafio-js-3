@@ -12,7 +12,7 @@ export function loadBlobFromLocalStorage(key, type) {
     return null;
   }
 
-  const byteCh = atob(base64Data.split(",")[1]);
+  const byteCh = atob(base64Data.split(',')[1]);
   const byteN = new Uint8Array(byteCh.length);
   for (const i in byteCh) {
     byteN[i] = byteCh.charCodeAt(i);

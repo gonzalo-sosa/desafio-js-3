@@ -1,8 +1,8 @@
-import "./styles/main.css";
+import './styles/main.css';
 
-import { Task, TaskList, LocalStorage } from "./modules/index";
-import { STATES, TASKS } from "./consts";
-import { getPosition } from "./services/location";
+import { Task, TaskList, LocalStorage } from './modules/index';
+import { STATES, TASKS } from './consts';
+import { getPosition } from './services/location';
 import {
   addContentToCanvas,
   addContentToDetails,
@@ -16,22 +16,22 @@ import {
   handleDragLeaveTask,
   handleDragOverTask,
   handleDropTask,
-} from "./utils/index";
+} from './utils/index';
 
 // Traer las tareas del local storage
-const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
+const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, '[]'));
 const inProgressTaskList = new TaskList(
-  LocalStorage.load(TASKS.IN_PROGRESS, "[]")
+  LocalStorage.load(TASKS.IN_PROGRESS, '[]')
 );
 const completedTaskList = new TaskList(
-  LocalStorage.load(TASKS.COMPLETED, "[]")
+  LocalStorage.load(TASKS.COMPLETED, '[]')
 );
 
 const worker = new Worker(
-  new URL("./services/web-socket-worker.js", import.meta.url)
+  new URL('./services/web-socket-worker.js', import.meta.url)
 );
 
-worker.postMessage("get_tasks");
+worker.postMessage('get_tasks');
 
 worker.onmessage = (e) => {
   const { data } = e;
@@ -50,7 +50,7 @@ worker.onmessage = (e) => {
         addTaskElementToListElement(task, $taskListCompleted);
         break;
       default:
-        console.log("Estado de tarea desconocido", task._state);
+        console.log('Estado de tarea desconocido', task._state);
         break;
     }
   }
@@ -62,13 +62,13 @@ LocalStorage.save(TASKS.IN_PROGRESS, inProgressTaskList.toString());
 LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 
 // Obtener elementos y listas de tareas
-const $sidebar = document.getElementById("sidebar");
-const $taskList = document.getElementById("taskList");
-const $taskListNew = document.getElementById("tasksNew");
-const $taskListInProgress = document.getElementById("tasksInProgress");
-const $taskListCompleted = document.getElementById("tasksCompleted");
-const $addTask = document.getElementById("addTaskBtn");
-const $addTaskForm = document.getElementById("addTaskForm");
+const $sidebar = document.getElementById('sidebar');
+const $taskList = document.getElementById('taskList');
+const $taskListNew = document.getElementById('tasksNew');
+const $taskListInProgress = document.getElementById('tasksInProgress');
+const $taskListCompleted = document.getElementById('tasksCompleted');
+const $addTask = document.getElementById('addTaskBtn');
+const $addTaskForm = document.getElementById('addTaskForm');
 
 // Crear tareas
 createTasks(newTaskList.getTasks(), $taskListNew);
@@ -79,7 +79,7 @@ createTasks(completedTaskList.getTasks(), $taskListCompleted);
 $sidebar.appendChild($taskList);
 
 // Manejo del formulario para agregar tareas
-$addTaskForm.addEventListener("submit", async (event) => {
+$addTaskForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const { title, description, dueDate } = getFormData(event);
@@ -101,25 +101,25 @@ $addTaskForm.addEventListener("submit", async (event) => {
   // usar worker
   if (window.Worker) {
     const wsWorker = new Worker(
-      new URL("./services/web-socket-worker.js", import.meta.url)
+      new URL('./services/web-socket-worker.js', import.meta.url)
     );
 
     wsWorker.postMessage(task);
 
     wsWorker.onmessage = (e) => {
       const { data } = e;
-      if (data.type === "TASK_SENT")
-        console.log("Tarea enviada correctamente: ", { ...data });
-      else console.log("Tarea enviada incorrectamente.");
+      if (data.type === 'TASK_SENT')
+        console.log('Tarea enviada correctamente: ', { ...data });
+      else console.log('Tarea enviada incorrectamente.');
     };
 
     const notificationWorker = new Worker(
-      new URL("./services/notification-worker.js", import.meta.url)
+      new URL('./services/notification-worker.js', import.meta.url)
     );
 
     notificationWorker.postMessage(task);
   } else {
-    new Notification("Lista de tareas", {
+    new Notification('Lista de tareas', {
       body: `Nueva tarea ${
         task.title
       } con expiración el ${task.dueDate.toLocaleString()}`,
@@ -128,12 +128,12 @@ $addTaskForm.addEventListener("submit", async (event) => {
   //ws.close();
 });
 
-$addTask.addEventListener("click", function () {
+$addTask.addEventListener('click', function () {
   toggleAddTaskFormVisibility($addTaskForm, $addTask, true);
 });
 
 // Evento de cambio de estado de tarea
-document.addEventListener("state-changed", (event) => {
+document.addEventListener('state-changed', (event) => {
   const { id, state } = event.detail;
 
   let task = newTaskList.getTaskById(id);
@@ -188,7 +188,7 @@ document.addEventListener("state-changed", (event) => {
 });
 
 // Evento de tarea eliminada
-document.addEventListener("task-deleted", (event) => {
+document.addEventListener('task-deleted', (event) => {
   const { id } = event.detail;
 
   let task = newTaskList.getTaskById(id);
@@ -216,16 +216,16 @@ document.addEventListener("task-deleted", (event) => {
 
 createTabManager();
 
-const $details = document.querySelector("[tab-content-name=details]");
-const $map = document.querySelector("[tab-content-name=map]");
-const $canvas = document.querySelector("[tab-content-name=canvas]");
+const $details = document.querySelector('[tab-content-name=details]');
+const $map = document.querySelector('[tab-content-name=map]');
+const $canvas = document.querySelector('[tab-content-name=canvas]');
 
 addContentToDetails($details);
 addContentToMap($map);
 addContentToCanvas($canvas);
 
-const $canvasElement = document.querySelector("canvas");
-const context = $canvasElement.getContext("2d");
+const $canvasElement = document.querySelector('canvas');
+const context = $canvasElement.getContext('2d');
 
 let initialX;
 let initialY;
@@ -234,9 +234,9 @@ const dibujar = (x, y) => {
   context.beginPath();
   context.moveTo(initialX, initialY);
   context.lineWidth = 5;
-  context.strokeStyle = "#000";
-  context.lineCap = "round";
-  context.lineJoin = "round";
+  context.strokeStyle = '#000';
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
   context.lineTo(x, y);
   context.stroke();
 
@@ -248,7 +248,7 @@ const mouseDown = (event) => {
   initialX = event.offsetX;
   initialY = event.offsetY;
   dibujar(initialX, initialY);
-  $canvasElement.addEventListener("mousemove", mouseMoving);
+  $canvasElement.addEventListener('mousemove', mouseMoving);
 };
 
 const mouseMoving = (event) => {
@@ -256,38 +256,38 @@ const mouseMoving = (event) => {
 };
 
 const mouseUp = () => {
-  $canvasElement.removeEventListener("mousemove", mouseMoving);
+  $canvasElement.removeEventListener('mousemove', mouseMoving);
 };
 
-$canvasElement.addEventListener("mousedown", mouseDown);
-$canvasElement.addEventListener("mouse", mouseUp);
+$canvasElement.addEventListener('mousedown', mouseDown);
+$canvasElement.addEventListener('mouse', mouseUp);
 
-const $clearCanvas = document.getElementById("clear-canvas");
-const $saveCanvas = document.getElementById("save-canvas");
+const $clearCanvas = document.getElementById('clear-canvas');
+const $saveCanvas = document.getElementById('save-canvas');
 
-$clearCanvas.addEventListener("click", handleClearCanvas);
-$saveCanvas.addEventListener("click", handleSaveCanvas);
+$clearCanvas.addEventListener('click', handleClearCanvas);
+$saveCanvas.addEventListener('click', handleSaveCanvas);
 
 function handleClearCanvas() {
-  const $canvas = document.querySelector("canvas");
-  const context = $canvas.getContext("2d");
+  const $canvas = document.querySelector('canvas');
+  const context = $canvas.getContext('2d');
 
-  context.fillStyle = "#fff";
+  context.fillStyle = '#fff';
   context.fillRect(0, 0, $canvas.width, $canvas.height);
   context.clearRect(0, 0, $canvas.width, $canvas.height);
 }
 
 function handleSaveCanvas() {
-  const $canvas = document.querySelector("canvas");
-  const imageData = $canvas.toDataURL("image/png");
-  const $tabManager = document.querySelector("tab-manager");
-  const taskId = $tabManager.getAttribute("task-id");
+  const $canvas = document.querySelector('canvas');
+  const imageData = $canvas.toDataURL('image/png');
+  const $tabManager = document.querySelector('tab-manager');
+  const taskId = $tabManager.getAttribute('task-id');
   LocalStorage.save(`${taskId}-canvas`, imageData);
 }
 
 // a cada tarea le agrego los eventos de dragstart y drag end
 
-const $taskElements = document.querySelectorAll("task-element");
+const $taskElements = document.querySelectorAll('task-element');
 
 $taskElements.forEach(($task) => {
   addEventsDragStartDragEnd($task);
@@ -295,27 +295,27 @@ $taskElements.forEach(($task) => {
 
 // para cada lista de tareas escucho el evento drop
 
-$taskListNew.addEventListener("drop", handleDropTask);
-$taskListInProgress.addEventListener("drop", handleDropTask);
-$taskListCompleted.addEventListener("drop", handleDropTask);
+$taskListNew.addEventListener('drop', handleDropTask);
+$taskListInProgress.addEventListener('drop', handleDropTask);
+$taskListCompleted.addEventListener('drop', handleDropTask);
 
 // para cada lista de tareas escucho el evento de dragover
 
-$taskListNew.addEventListener("dragover", handleDragOverTask);
-$taskListInProgress.addEventListener("dragover", handleDragOverTask);
-$taskListCompleted.addEventListener("dragover", handleDragOverTask);
+$taskListNew.addEventListener('dragover', handleDragOverTask);
+$taskListInProgress.addEventListener('dragover', handleDragOverTask);
+$taskListCompleted.addEventListener('dragover', handleDragOverTask);
 
 // para cada lista de tareas escucho el evento dragleave
 
-$taskListNew.addEventListener("dragleave", handleDragLeaveTask);
-$taskListInProgress.addEventListener("dragleave", handleDragLeaveTask);
-$taskListCompleted.addEventListener("dragleave", handleDragLeaveTask);
+$taskListNew.addEventListener('dragleave', handleDragLeaveTask);
+$taskListInProgress.addEventListener('dragleave', handleDragLeaveTask);
+$taskListCompleted.addEventListener('dragleave', handleDragLeaveTask);
 
-const $notificationElement = document.querySelector("notification-element");
+const $notificationElement = document.querySelector('notification-element');
 
-$notificationElement.addEventListener("click", () => {
-  if (!("Notification" in window)) {
-    console.log("Este navegador no admite notificaciones.");
+$notificationElement.addEventListener('click', () => {
+  if (!('Notification' in window)) {
+    console.log('Este navegador no admite notificaciones.');
   } else {
     Notification.requestPermission().then((permission) => {
       $notificationElement.changeBtn(permission);

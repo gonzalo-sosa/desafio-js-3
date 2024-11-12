@@ -1,4 +1,4 @@
-import * as L from "leaflet";
+import * as L from 'leaflet';
 
 export function createMap(
   container,
@@ -9,7 +9,7 @@ export function createMap(
     animate: true,
   });
 
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     minZoom: 10,
     maxZoom: 20,
     attribution:
@@ -31,7 +31,7 @@ export function editViewToMap($taskElement) {
 export var markers = {};
 
 export function addMarkerToMap($taskElement) {
-  const id = $taskElement.getAttribute("id");
+  const id = $taskElement.getAttribute('id');
 
   if (!markers[id]) {
     L.marker($taskElement.location).addTo(window.LMap);

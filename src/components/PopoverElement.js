@@ -3,9 +3,9 @@
 export class PopoverElement extends HTMLElement {
   constructor() {
     super();
-    this.open = this.getAttribute("open") === "true";
+    this.open = this.getAttribute('open') === 'true';
 
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({ mode: 'open' });
     this.shadowRoot.innerHTML = `
       <style>
         .popover{
@@ -23,13 +23,13 @@ export class PopoverElement extends HTMLElement {
       <div class="popover"><slot/></div>
     `;
 
-    this.div = this.shadowRoot.querySelector("div");
+    this.div = this.shadowRoot.querySelector('div');
   }
 
   togglePopover() {
     this.open = !this.open;
-    this.setAttribute("open", this.open);
-    this.div.classList.toggle("popover--open");
+    this.setAttribute('open', this.open);
+    this.div.classList.toggle('popover--open');
   }
 
   disconnectedCallback() {
@@ -37,4 +37,4 @@ export class PopoverElement extends HTMLElement {
   }
 }
 
-customElements.define("popover-element", PopoverElement);
+customElements.define('popover-element', PopoverElement);

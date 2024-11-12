@@ -10,7 +10,7 @@ export class TaskList {
   removeTask(toRemove) {
     const index = this._list.findIndex((task) => task.id == toRemove.id);
 
-    if (index === -1) throw new Error("Tarea inexistente.");
+    if (index === -1) throw new Error('Tarea inexistente.');
 
     this._list.splice(index, 1);
   }

@@ -1,5 +1,5 @@
 export function isString(str) {
-  return typeof str === "string";
+  return typeof str === 'string';
 }
 
 export function isDate(date) {
