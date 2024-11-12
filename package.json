@@ -9,6 +9,7 @@
     "dev:build": "webpack --mode development --env NODE_ENV=development",
     "build": "webpack --mode production --env NODE_ENV=production",
     "lint": "eslint --ignore-pattern dist/",
+    "lint:fix": "eslint --ignore-pattern dist/ --fix",
     "format:check": "prettier --config .prettierrc -c .",
     "format:fix": "prettier --config .prettierrc . --write"
   },
