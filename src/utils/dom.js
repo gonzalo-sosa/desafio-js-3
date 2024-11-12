@@ -1,7 +1,10 @@
 import { TabContent, TabManager, TaskElement } from "../components";
+import { RecordElement } from "../components/RecordElement";
 import { TAB_MANAGER_CONTENT } from "../consts";
 import { addEventsDragStartDragEnd } from "./drag-drop";
 import { createMap, editContentToMap } from "./map";
+import { LocalStorage } from "../modules/index";
+import { loadBlobFromLocalStorage, saveBlobToLocalStorage } from "./covert";
 
 export function createTasks(tasks, target) {
   if (Array.isArray(tasks) && tasks.length > 0)
@@ -205,46 +208,16 @@ export function addContentToDetails(details) {
   const $audioContainer = document.createElement("div");
   $audioContainer.classList.add("flex", "flex-row", "gap-1", "items-center");
 
-  const $startBtn = document.createElement("button");
-  $startBtn.id = "startBtn";
-  $startBtn.textContent = "Iniciar Grabación";
-  $startBtn.type = "button";
-  $startBtn.classList.add(
-    "btn",
-    "btn-record",
-    "text-xs",
-    "py-1",
-    "px-2",
-    "rounded-md",
-    "bg-green-500",
-    "text-white",
-    "hover:bg-green-600"
+  const $record = new RecordElement(
+    ({ id }) => {
+      loadBlobFromLocalStorage(`${id}-audio`, "application/octet-stream");
+    },
+    (data, { id }) => {
+      saveBlobToLocalStorage(data, `${id}-audio`);
+    }
   );
 
-  const $stopBtn = document.createElement("button");
-  $stopBtn.id = "stopBtn";
-  $stopBtn.textContent = "Detener Grabación";
-  $stopBtn.type = "button";
-  $stopBtn.disabled = true; // Inicialmente está deshabilitado
-  $stopBtn.classList.add(
-    "btn",
-    "btn-record",
-    "text-xs",
-    "py-1",
-    "px-2",
-    "rounded-md",
-    "bg-red-500",
-    "text-white",
-    "hover:bg-red-600"
-  );
-
-  const $audioPlayback = document.createElement("audio");
-  $audioPlayback.id = "audioPlayback";
-  $audioPlayback.controls = true;
-
-  $audioContainer.appendChild($startBtn);
-  $audioContainer.appendChild($stopBtn);
-  $audioContainer.appendChild($audioPlayback);
+  $audioContainer.appendChild($record);
 
   $gridContainer.appendChild($titleFieldContainer);
   $gridContainer.appendChild($descriptionFieldContainer);
@@ -439,6 +412,7 @@ function editContentToDetails($details, $taskElement) {
   const $title = $details.querySelector("[name=title]");
   const $description = $details.querySelector("[name=description");
   const $dueDate = $details.querySelector("[name=due-date]");
+  const $record = $details.querySelector("record-element");
 
   $title.setAttribute("value", $taskElement.title);
   $description.value = $taskElement.description ?? "";
@@ -446,6 +420,12 @@ function editContentToDetails($details, $taskElement) {
     "value",
     new Date($taskElement.dueDate).toISOString().split("T")[0]
   );
+
+  const id = document.querySelector("tab-manager").getAttribute("task-id");
+  const src = localStorage.getItem(`${id}-audio`);
+
+  $record.setAttribute("task-id", id);
+  $record.setAttribute("src", src ?? "");
 }
 
 function editContentToCanvas($canvas, $taskElement) {
