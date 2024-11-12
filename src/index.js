@@ -1,21 +1,24 @@
 import "./styles/main.css";
 
 import { Task, TaskList, LocalStorage } from "./modules/index";
-import { STATES, TAB_MANAGER_CONTENT, TASKS } from "./consts";
+import { STATES, TASKS } from "./consts";
 import { getPosition } from "./services/location";
-import { TabContent, TabManager } from "./components/index";
 import {
-  getFormData,
   addContentToCanvas,
   addContentToDetails,
   addContentToMap,
   addTaskElementToListElement,
   toggleAddTaskFormVisibility,
-  handleDropTask,
-  handleDragOverTask,
-  handleDragLeaveTask,
   addEventsDragStartDragEnd,
-} from "./utils/dom";
+  createTabManager,
+  createTasks,
+} from "./utils/index";
+import {
+  getFormData,
+  handleDragLeaveTask,
+  handleDragOverTask,
+  handleDropTask,
+} from "./utils";
 
 // Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
@@ -49,7 +52,7 @@ worker.onmessage = (e) => {
         addTaskElementToListElement(task, $taskListCompleted);
         break;
       default:
-        console.log("Estado de tarea desconocido", task.state);
+        console.log("Estado de tarea desconocido", task._state);
         break;
     }
   }
@@ -73,13 +76,6 @@ const $addTaskForm = document.getElementById("addTaskForm");
 createTasks(newTaskList.getTasks(), $taskListNew);
 createTasks(inProgressTaskList.getTasks(), $taskListInProgress);
 createTasks(completedTaskList.getTasks(), $taskListCompleted);
-
-function createTasks(tasks, target) {
-  if (Array.isArray(tasks) && tasks.length > 0)
-    tasks.forEach((task) => {
-      addTaskElementToListElement(task, target);
-    });
-}
 
 // Agregar lista de tareas al sidebar
 $sidebar.appendChild($taskList);
@@ -220,28 +216,6 @@ document.addEventListener("task-deleted", (event) => {
   LocalStorage.save(TASKS.COMPLETED, completedTaskList.toString());
 });
 
-function createTabManager() {
-  const $main = document.getElementById("main");
-  const $tabManager = new TabManager();
-  const tabs = $tabManager.tabs;
-
-  const $tabsContent = tabs.map((tab, i) => {
-    const $tabContent = new TabContent(
-      tab,
-      TAB_MANAGER_CONTENT[i].title,
-      TAB_MANAGER_CONTENT[i].description
-    );
-
-    return $tabContent;
-  });
-
-  $tabsContent.forEach(($tabContent) =>
-    $tabManager.container.appendChild($tabContent)
-  );
-
-  $main.appendChild($tabManager);
-}
-
 createTabManager();
 
 const $details = document.querySelector("[tab-content-name=details]");
@@ -350,3 +324,41 @@ $notificationElement.addEventListener("click", () => {
     });
   }
 });
+
+var mediaRecorder;
+var recordedChunks = [];
+
+document.getElementById("startBtn").addEventListener("click", startRecording());
+
+document.getElementById("stopBtn").addEventListener("click", stopRecording);
+
+async function startRecording() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  mediaRecorder = new MediaRecorder(stream);
+
+  mediaRecorder.ondataavailable = (event) => {
+    if (event.data.size > 0) {
+      recordedChunks.push(event.data);
+    }
+  };
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: "audio/webm" });
+    const audioURL = URL.createObjectURL(blob);
+    document.getElementById("audioPlayback").src = audioURL;
+    recordedChunks = []; // Limpiar los chunks grabados
+
+    const id = document.querySelector("tab-manager").getAttribute("task-id");
+    LocalStorage.save(`${id}-audio`, audioURL);
+  };
+
+  mediaRecorder.start();
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("stopBtn").disabled = false;
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("stopBtn").disabled = true;
+}

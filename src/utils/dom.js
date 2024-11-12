@@ -1,5 +1,36 @@
-import { TaskElement } from "../components";
-import * as L from "leaflet";
+import { TabContent, TabManager, TaskElement } from "../components";
+import { TAB_MANAGER_CONTENT } from "../consts";
+import { addEventsDragStartDragEnd } from "./drag-drop";
+import { createMap, editContentToMap } from "./map";
+
+export function createTasks(tasks, target) {
+  if (Array.isArray(tasks) && tasks.length > 0)
+    tasks.forEach((task) => {
+      addTaskElementToListElement(task, target);
+    });
+}
+
+export function createTabManager() {
+  const $main = document.getElementById("main");
+  const $tabManager = new TabManager();
+  const tabs = $tabManager.tabs;
+
+  const $tabsContent = tabs.map((tab, i) => {
+    const $tabContent = new TabContent(
+      tab,
+      TAB_MANAGER_CONTENT[i].title,
+      TAB_MANAGER_CONTENT[i].description
+    );
+
+    return $tabContent;
+  });
+
+  $tabsContent.forEach(($tabContent) =>
+    $tabManager.container.appendChild($tabContent)
+  );
+
+  $main.appendChild($tabManager);
+}
 
 export function addContentToDetails(details) {
   const $form = document.createElement("form");
@@ -171,9 +202,54 @@ export function addContentToDetails(details) {
   });
   $dueDateFieldContainer.appendChild($dueDateCopyButton);
 
+  const $audioContainer = document.createElement("div");
+  $audioContainer.classList.add("flex", "flex-row", "gap-1", "items-center");
+
+  const $startBtn = document.createElement("button");
+  $startBtn.id = "startBtn";
+  $startBtn.textContent = "Iniciar Grabación";
+  $startBtn.type = "button";
+  $startBtn.classList.add(
+    "btn",
+    "btn-record",
+    "text-xs",
+    "py-1",
+    "px-2",
+    "rounded-md",
+    "bg-green-500",
+    "text-white",
+    "hover:bg-green-600"
+  );
+
+  const $stopBtn = document.createElement("button");
+  $stopBtn.id = "stopBtn";
+  $stopBtn.textContent = "Detener Grabación";
+  $stopBtn.type = "button";
+  $stopBtn.disabled = true; // Inicialmente está deshabilitado
+  $stopBtn.classList.add(
+    "btn",
+    "btn-record",
+    "text-xs",
+    "py-1",
+    "px-2",
+    "rounded-md",
+    "bg-red-500",
+    "text-white",
+    "hover:bg-red-600"
+  );
+
+  const $audioPlayback = document.createElement("audio");
+  $audioPlayback.id = "audioPlayback";
+  $audioPlayback.controls = true;
+
+  $audioContainer.appendChild($startBtn);
+  $audioContainer.appendChild($stopBtn);
+  $audioContainer.appendChild($audioPlayback);
+
   $gridContainer.appendChild($titleFieldContainer);
   $gridContainer.appendChild($descriptionFieldContainer);
   $gridContainer.appendChild($dueDateFieldContainer);
+  $gridContainer.appendChild($audioContainer);
 
   $form.appendChild($gridContainer);
 
@@ -206,21 +282,6 @@ export function addContentToMap(map) {
   map.target.appendChild($mapContainer);
 
   window.LMap.invalidateSize();
-}
-
-function createMap(container, latitude = -34.61315, longitude = -58.67723) {
-  const map = L.map(container, {}).setView([latitude, longitude], 13, {
-    animate: true,
-  });
-
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    minZoom: 10,
-    maxZoom: 20,
-    attribution:
-      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  }).addTo(map);
-
-  return map;
 }
 
 export function addContentToCanvas(canvas) {
@@ -331,22 +392,6 @@ export function toggleAddTaskFormVisibility(addTaskForm, addTask, isVisible) {
   addTask.classList.toggle("active", !isVisible);
 }
 
-export function getFormData(event) {
-  const $addTaskForm = event.target;
-
-  const data = new FormData($addTaskForm);
-
-  const title = data.get("title");
-  const description = data.get("description");
-  const dueDate = data.get("due-date");
-
-  return {
-    title,
-    description,
-    dueDate,
-  };
-}
-
 export function addTaskElementToListElement(task, list) {
   const $taskElement = createTaskElement(task);
 
@@ -403,26 +448,6 @@ function editContentToDetails($details, $taskElement) {
   );
 }
 
-function editContentToMap($taskElement) {
-  editViewToMap($taskElement);
-  addMarkerToMap($taskElement);
-}
-
-function editViewToMap($taskElement) {
-  window.LMap.setView($taskElement.location, 15);
-}
-
-export var markers = {};
-
-function addMarkerToMap($taskElement) {
-  const id = $taskElement.getAttribute("id");
-
-  if (!markers[id]) {
-    L.marker($taskElement.location).addTo(window.LMap);
-    markers[`${id}`] = true;
-  }
-}
-
 function editContentToCanvas($canvas, $taskElement) {
   // traer de local storage sino dejarlo como estaba
   const canvas = $canvas.querySelector("canvas");
@@ -443,53 +468,4 @@ function editContentToCanvas($canvas, $taskElement) {
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.clearRect(0, 0, canvas.width, canvas.height);
   }
-}
-
-export var draggedElement = null;
-export var sourceContainer = null;
-
-export function addEventsDragStartDragEnd(target) {
-  target.addEventListener("dragstart", handleDragStart);
-  target.addEventListener("dragend", handleDragEnd);
-}
-
-function handleDragStart(event) {
-  draggedElement = event.target;
-  sourceContainer = draggedElement.parentNode;
-}
-
-function handleDragEnd() {
-  draggedElement = null;
-  sourceContainer = null;
-}
-
-export function handleDropTask(event) {
-  console.log("DROP");
-  event.preventDefault();
-
-  let { target } = event;
-
-  if (!target) {
-    return;
-  }
-
-  if (target.parentNode.getAttribute("id") !== "taskList") {
-    target = target.parentNode;
-  }
-
-  if (target !== sourceContainer && draggedElement) {
-    sourceContainer.removeChild(draggedElement);
-
-    target.appendChild(draggedElement);
-
-    draggedElement.updateState(target.getAttribute("state"));
-  }
-}
-
-export function handleDragOverTask(event) {
-  event.preventDefault();
-}
-
-export function handleDragLeaveTask(event) {
-  console.log("DRAG LEAVE", event);
 }
