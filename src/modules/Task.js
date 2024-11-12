@@ -33,7 +33,7 @@ export class Task {
 
   toJSON() {
     return {
-      id: this._id,
+      id: this.id,
       title: this.title,
       description: this.description,
       dueDate: this.dueDate.toISOString(),
