@@ -48,4 +48,29 @@ class TaskElement extends HTMLElement {
 }
 ```
 
+## Configuración
+
+### Webpack
+
+Instalé webpack con el plugin que permite crear un servidor de desarrollo en un puerto del navegador "webpack-dev-server".
+
+### Tailwind
+
+Agregué tailwind para los estilos por lo que tuve que configurar su ejecución para agregarlo a webpack. Instalé plugin de tailwind para webpack y instalé tailwind con postcss.
+
+### Gitignore
+
+Utilice ".gitignore" para evitar que se suban al github archivos innecesarios como "node_modules/" o la carpeta "dist/". Además, evité subir archivos sensibles como ".env" para no exponer datos comprometedores.
+
+### Eslint
+
+Eslint analiza el código y emite advertencias y errores antes de que se ejecute el programa.
+
+Instalé tanto la extensión de eslint para vscode como la dependencia de desarrollo y el plugin de webpack para buscar errores en mi código.
+
+### Prettier
+
+Anteriormente utilizaba prettier pero únicamente como extensión de vscode, pero con el avance del desarrollo integré la dependencia al proyecto para formatear el código en cada uno de los archivos y que estos sigan una armonía preestablecida.
+Intenté agregar el plugin de prettier para webpack pero luego de unos pocos intentos decidí desinstalarlo ya que no me aportaba mejoras sustanciales.
+
 ## Implementación
