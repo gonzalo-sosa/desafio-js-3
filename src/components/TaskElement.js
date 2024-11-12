@@ -79,7 +79,6 @@ export class TaskElement extends HTMLElement {
           padding: 0;
           list-style-type: none;
         }
-
         .state-list button{
           font-size: 10px;
           width: 100%;
@@ -88,7 +87,6 @@ export class TaskElement extends HTMLElement {
           border: 0;
           text-align: start;
         }
-
         .state-list button state-icon-element{
           font-size: 10px;
           margin-right: 10px;
