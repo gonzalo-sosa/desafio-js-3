@@ -12,13 +12,11 @@ import {
   addEventsDragStartDragEnd,
   createTabManager,
   createTasks,
-} from "./utils/index";
-import {
   getFormData,
   handleDragLeaveTask,
   handleDragOverTask,
   handleDropTask,
-} from "./utils";
+} from "./utils/index";
 
 // Traer las tareas del local storage
 const newTaskList = new TaskList(LocalStorage.load(TASKS.NEW, "[]"));
@@ -324,41 +322,3 @@ $notificationElement.addEventListener("click", () => {
     });
   }
 });
-
-var mediaRecorder;
-var recordedChunks = [];
-
-document.getElementById("startBtn").addEventListener("click", startRecording());
-
-document.getElementById("stopBtn").addEventListener("click", stopRecording);
-
-async function startRecording() {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  mediaRecorder = new MediaRecorder(stream);
-
-  mediaRecorder.ondataavailable = (event) => {
-    if (event.data.size > 0) {
-      recordedChunks.push(event.data);
-    }
-  };
-
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: "audio/webm" });
-    const audioURL = URL.createObjectURL(blob);
-    document.getElementById("audioPlayback").src = audioURL;
-    recordedChunks = []; // Limpiar los chunks grabados
-
-    const id = document.querySelector("tab-manager").getAttribute("task-id");
-    LocalStorage.save(`${id}-audio`, audioURL);
-  };
-
-  mediaRecorder.start();
-  document.getElementById("startBtn").disabled = true;
-  document.getElementById("stopBtn").disabled = false;
-}
-
-function stopRecording() {
-  mediaRecorder.stop();
-  document.getElementById("startBtn").disabled = false;
-  document.getElementById("stopBtn").disabled = true;
-}
