@@ -6,7 +6,6 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
 const ESLintPlugin = require("eslint-webpack-plugin");
-const PrettierPlugin = require("prettier-webpack-plugin");
 
 module.exports = (env) => {
   const isProduction = env.NODE_ENV === "production";
@@ -98,12 +97,7 @@ module.exports = (env) => {
         emitWarning: true,
         failOnWarning: false,
         failOnError: true,
-      }),
-      new PrettierPlugin({
-        tabWidth: 2,
-        semi: true,
-        extensions: [".js"],
-      }),
+      })
     ],
   };
 };
