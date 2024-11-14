@@ -17,7 +17,6 @@ function handleDragEnd() {
 }
 
 export function handleDropTask(event) {
-  console.log('DROP');
   event.preventDefault();
 
   let { target } = event;
