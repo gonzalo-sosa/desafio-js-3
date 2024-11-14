@@ -1,22 +1,22 @@
 import {
   CanvasElement,
-  RecordElement,
   TabContent,
   TabManager,
   TaskElement,
 } from '../components';
 import { TAB_MANAGER_CONTENT } from '../consts';
+import { CanvasEditor, DetailsEditor } from '../modules/index';
 import {
-  createCopyButton,
-  createInputField,
-  createTextArea,
+  createAudioField,
+  createButton,
+  createDescriptionField,
+  createDueDateField,
+  createTitleField,
 } from './dom/create-element';
 import {
   addEventsDragStartDragEnd,
   createMap,
   editContentToMap,
-  loadBlobFromLocalStorage,
-  saveBlobToLocalStorage,
 } from './index';
 
 export function createTasks(tasks, target) {
@@ -54,161 +54,10 @@ export function addContentToDetails(details) {
   const $gridContainer = document.createElement('div');
   $gridContainer.classList.add('grid', 'w-full', 'items-center', 'gap-4');
 
-  const $titleFieldContainer = document.createElement('div');
-  $titleFieldContainer.classList.add(
-    'max-w-80%',
-    'flex',
-    'flex-row',
-    'gap-1',
-    'items-center'
-  );
-
-  const $titleInput = createInputField({
-    id: 'title',
-    name: 'title',
-    placeholder: 'Título de la tarea',
-  });
-  $titleInput.classList.add(
-    'flex',
-    'h-10',
-    'w-full',
-    'max-w-[80%]',
-    'rounded-md',
-    'border',
-    'border-input',
-    'bg-background',
-    'px-3',
-    'py-2',
-    'text-sm',
-    'ring-offset-background',
-    'file:border-0',
-    'file:bg-transparent',
-    'file:text-sm',
-    'file:font-medium',
-    'file:text-foreground',
-    'placeholder:text-muted-foreground',
-    'focus-visible:outline-none',
-    'focus-visible:ring-2',
-    'focus-visible:ring-ring',
-    'focus-visible:ring-offset-2',
-    'disabled:cursor-not-allowed',
-    'disabled:opacity-50'
-  );
-  $titleFieldContainer.appendChild($titleInput);
-
-  // Botón para copiar el título
-  const $titleCopyButton = createCopyButton('Copiar', $titleInput);
-  $titleCopyButton.classList.add(
-    'btn',
-    'btn-copy',
-    'text-xs',
-    'py-1',
-    'px-2',
-    'rounded-md',
-    'bg-blue-500',
-    'text-white',
-    'hover:bg-blue-600'
-  );
-
-  $titleFieldContainer.appendChild($titleCopyButton);
-
-  const $descriptionFieldContainer = document.createElement('div');
-  $descriptionFieldContainer.classList.add(
-    'flex',
-    'flex-row',
-    'gap-1',
-    'items-center'
-  );
-
-  const $descriptionTextarea = createTextArea({
-    id: 'description',
-    name: 'description',
-    placeholder: 'Descripción de la tarea',
-  });
-
-  $descriptionTextarea.classList.add(
-    'flex',
-    'min-h-[80px]',
-    'w-full',
-    'max-w-[80%]',
-    'rounded-md',
-    'border',
-    'border-input',
-    'bg-background',
-    'px-3',
-    'py-2',
-    'text-sm',
-    'ring-offset-background',
-    'placeholder:text-muted-foreground',
-    'focus-visible:outline-none',
-    'focus-visible:ring-2',
-    'focus-visible:ring-ring',
-    'focus-visible:ring-offset-2',
-    'disabled:cursor-not-allowed',
-    'disabled:opacity-50'
-  );
-  $descriptionFieldContainer.appendChild($descriptionTextarea);
-
-  const $descriptionCopyButton = createCopyButton(
-    'Copiar',
-    $descriptionTextarea
-  );
-  $descriptionCopyButton.classList.add(
-    'btn',
-    'btn-copy',
-    'text-xs',
-    'py-1',
-    'px-2',
-    'rounded-md',
-    'bg-blue-500',
-    'text-white',
-    'hover:bg-blue-600'
-  );
-
-  $descriptionFieldContainer.appendChild($descriptionCopyButton);
-
-  const $dueDateFieldContainer = document.createElement('div');
-  $dueDateFieldContainer.classList.add(
-    'flex',
-    'flex-row',
-    'items-center',
-    'gap-1.5'
-  );
-  const $dueDateInput = document.createElement('input');
-  $dueDateInput.type = 'date';
-  $dueDateInput.id = 'due-date';
-  $dueDateInput.name = 'due-date';
-  $dueDateFieldContainer.appendChild($dueDateInput);
-
-  const $dueDateCopyButton = createCopyButton('Copiar', $dueDateInput);
-
-  $dueDateCopyButton.classList.add(
-    'btn',
-    'btn-copy',
-    'text-xs',
-    'py-1',
-    'px-2',
-    'rounded-md',
-    'bg-blue-500',
-    'text-white',
-    'hover:bg-blue-600'
-  );
-
-  $dueDateFieldContainer.appendChild($dueDateCopyButton);
-
-  const $audioContainer = document.createElement('div');
-  $audioContainer.classList.add('flex', 'flex-row', 'gap-1', 'items-center');
-
-  const $record = new RecordElement(
-    ({ id }) => {
-      loadBlobFromLocalStorage(`${id}-audio`, 'application/octet-stream');
-    },
-    (data, { id }) => {
-      saveBlobToLocalStorage(data, `${id}-audio`);
-    }
-  );
-
-  $audioContainer.appendChild($record);
+  const $titleFieldContainer = createTitleField();
+  const $descriptionFieldContainer = createDescriptionField();
+  const $dueDateFieldContainer = createDueDateField();
+  const $audioContainer = createAudioField();
 
   $gridContainer.appendChild($titleFieldContainer);
   $gridContainer.appendChild($descriptionFieldContainer);
@@ -262,69 +111,73 @@ export function addContentToCanvas(canvas) {
     'justify-between'
   );
 
-  const $clearButton = document.createElement('button');
-  $clearButton.id = 'clear-canvas';
-  $clearButton.classList.add(
-    'inline-flex',
-    'items-center',
-    'justify-center',
-    'gap-2',
-    'whitespace-nowrap',
-    'rounded-md',
-    'text-sm',
-    'font-medium',
-    'ring-offset-background',
-    'transition-colors',
-    'focus-visible:outline-none',
-    'focus-visible:ring-2',
-    'focus-visible:ring-ring',
-    'focus-visible:ring-offset-2',
-    'disabled:pointer-events-none',
-    'disabled:opacity-50',
-    '[&_svg]:pointer-events-none',
-    '[&_svg]:size-4',
-    '[&_svg]:shrink-0',
-    'border',
-    'border-input',
-    'bg-background',
-    'hover:bg-accent',
-    'hover:text-accent-foreground',
-    'h-10',
-    'px-4',
-    'py-2'
-  );
-  $clearButton.textContent = 'Limpiar';
+  const $clearButton = createButton({
+    id: 'clear-canvas',
+    type: 'button',
+    text: ' Limpiar',
+    classes: [
+      'inline-flex',
+      'items-center',
+      'justify-center',
+      'gap-2',
+      'whitespace-nowrap',
+      'rounded-md',
+      'text-sm',
+      'font-medium',
+      'ring-offset-background',
+      'transition-colors',
+      'focus-visible:outline-none',
+      'focus-visible:ring-2',
+      'focus-visible:ring-ring',
+      'focus-visible:ring-offset-2',
+      'disabled:pointer-events-none',
+      'disabled:opacity-50',
+      '[&_svg]:pointer-events-none',
+      '[&_svg]:size-4',
+      '[&_svg]:shrink-0',
+      'border',
+      'border-input',
+      'bg-background',
+      'hover:bg-accent',
+      'hover:text-accent-foreground',
+      'h-10',
+      'px-4',
+      'py-2',
+    ],
+  });
 
-  const $saveButton = document.createElement('button');
-  $saveButton.id = 'save-canvas';
-  $saveButton.classList.add(
-    'inline-flex',
-    'items-center',
-    'justify-center',
-    'gap-2',
-    'whitespace-nowrap',
-    'rounded-md',
-    'text-sm',
-    'font-medium',
-    'ring-offset-background',
-    'transition-colors',
-    'focus-visible:outline-none',
-    'focus-visible:ring-2',
-    'focus-visible:ring-ring',
-    'focus-visible:ring-offset-2',
-    'disabled:pointer-events-none',
-    'disabled:opacity-50',
-    '[&_svg]:pointer-events-none',
-    '[&_svg]:size-4',
-    '[&_svg]:shrink-0',
-    'bg-primary',
-    'text-primary-foreground',
-    'hover:bg-primary/90',
-    'h-10',
-    'px-4',
-    'py-2'
-  );
-  $saveButton.textContent = 'Guardar Dibujo';
+  const $saveButton = createButton({
+    id: 'save-canvas',
+    type: 'button',
+    text: 'Guardar Dibujo',
+    classes: [
+      'inline-flex',
+      'items-center',
+      'justify-center',
+      'gap-2',
+      'whitespace-nowrap',
+      'rounded-md',
+      'text-sm',
+      'font-medium',
+      'ring-offset-background',
+      'transition-colors',
+      'focus-visible:outline-none',
+      'focus-visible:ring-2',
+      'focus-visible:ring-ring',
+      'focus-visible:ring-offset-2',
+      'disabled:pointer-events-none',
+      'disabled:opacity-50',
+      '[&_svg]:pointer-events-none',
+      '[&_svg]:size-4',
+      '[&_svg]:shrink-0',
+      'bg-primary',
+      'text-primary-foreground',
+      'hover:bg-primary/90',
+      'h-10',
+      'px-4',
+      'py-2',
+    ],
+  });
 
   $buttonsContainer.appendChild($clearButton);
   $buttonsContainer.appendChild($saveButton);
@@ -364,6 +217,15 @@ function addEventChangeTabManagerContent(task) {
   task.addEventListener('click', (event) => changeTabManagerContent(event));
 }
 
+export function updateTaskContentInTab($taskElement, $details, $canvas) {
+  const detailsEditor = new DetailsEditor();
+  const canvasEditor = new CanvasEditor();
+
+  detailsEditor.editContent($details, $taskElement);
+  canvasEditor.editContent($canvas, $taskElement);
+  editContentToMap($taskElement);
+}
+
 export function changeTabManagerContent(event) {
   const $taskElement = event.target;
   const id = $taskElement.getAttribute('id');
@@ -375,63 +237,6 @@ export function changeTabManagerContent(event) {
   $tabManager.setAttribute('task-id', id);
 
   if ($taskElement) {
-    editContentToDetails($details, $taskElement);
-    editContentToMap($taskElement);
-    editContentToCanvas($canvas, $taskElement);
-  }
-}
-
-function editContentToDetails($details, $taskElement) {
-  const $title = $details.querySelector('[name=title]');
-  const $description = $details.querySelector('[name=description');
-  const $dueDate = $details.querySelector('[name=due-date]');
-  const $record = $details.querySelector('record-element');
-
-  $title.setAttribute('value', $taskElement.title);
-  $description.value = $taskElement.description ?? '';
-  $dueDate.setAttribute(
-    'value',
-    new Date($taskElement.dueDate).toISOString().split('T')[0]
-  );
-
-  const id = document.querySelector('tab-manager').getAttribute('task-id');
-  const src = localStorage.getItem(`${id}-audio`);
-
-  $record.setAttribute('task-id', id);
-  $record.setAttribute('src', src ?? '');
-}
-
-function editContentToCanvas($canvas, $taskElement) {
-  // traer de local storage sino dejarlo como estaba
-  const $canvasElement = $canvas.querySelector('canvas-element');
-  const id = $taskElement.getAttribute('id');
-  const canvasData = localStorage.getItem(`${id}-canvas`);
-
-  $canvasElement.id = id;
-
-  // Limpiar canvas antes de cargar imagen
-  let context = $canvasElement.context;
-  context.fillStyle = '#fff';
-  context.fillRect(
-    0,
-    0,
-    $canvasElement.$canvas.width,
-    $canvasElement.$canvas.height
-  );
-  context.clearRect(
-    0,
-    0,
-    $canvasElement.$canvas.width,
-    $canvasElement.$canvas.height
-  );
-
-  if (canvasData) {
-    let img = new Image();
-    img.onload = function () {
-      let context = $canvasElement.context;
-      context.drawImage(img, 0, 0);
-    };
-
-    img.src = canvasData;
+    updateTaskContentInTab($taskElement, $details, $canvas);
   }
 }
