@@ -1,5 +1,3 @@
-// TODO: quitar popover al realizar click fuera de la lista
-
 export class PopoverElement extends HTMLElement {
   constructor() {
     super();
