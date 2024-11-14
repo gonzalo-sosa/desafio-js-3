@@ -4,6 +4,7 @@ import { TAB_MANAGER_CONTENT } from '../consts';
 import { addEventsDragStartDragEnd } from './drag-drop';
 import { createMap, editContentToMap } from './map';
 import { loadBlobFromLocalStorage, saveBlobToLocalStorage } from './covert';
+import { CanvasElement } from '../components/CanvasElement';
 
 export function createTasks(tasks, target) {
   if (Array.isArray(tasks) && tasks.length > 0)
@@ -257,27 +258,9 @@ export function addContentToMap(map) {
 }
 
 export function addContentToCanvas(canvas) {
-  const $drawingAreaContainer = document.createElement('div');
-  $drawingAreaContainer.id = 'canvas';
-  $drawingAreaContainer.classList.add(
-    'w-full',
-    'h-64',
-    'bg-white',
-    'border-2',
-    'border-dashed',
-    'border-gray-300',
-    'flex',
-    'items-center',
-    'justify-center'
-  );
+  const $canvasElement = new CanvasElement();
 
-  const $canvas = document.createElement('canvas');
-  $canvas.width = 200;
-  $canvas.height = 100;
-
-  $drawingAreaContainer.appendChild($canvas);
-
-  canvas.target.appendChild($drawingAreaContainer);
+  canvas.target.appendChild($canvasElement);
 
   const $buttonsContainer = document.createElement('div');
   $buttonsContainer.classList.add(
@@ -429,22 +412,34 @@ function editContentToDetails($details, $taskElement) {
 
 function editContentToCanvas($canvas, $taskElement) {
   // traer de local storage sino dejarlo como estaba
-  const canvas = $canvas.querySelector('canvas');
+  const $canvasElement = $canvas.querySelector('canvas-element');
   const id = $taskElement.getAttribute('id');
   const canvasData = localStorage.getItem(`${id}-canvas`);
+
+  $canvasElement.id = id;
 
   if (canvasData) {
     let img = new Image();
     img.onload = function () {
-      let context = canvas.getContext('2d');
+      let context = $canvasElement.context;
       context.drawImage(img, 0, 0);
     };
 
     img.src = canvasData;
   } else {
-    let context = canvas.getContext('2d');
+    let context = $canvasElement.context;
     context.fillStyle = '#fff';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(
+      0,
+      0,
+      $canvasElement.$canvas.width,
+      $canvasElement.$canvas.height
+    );
+    context.clearRect(
+      0,
+      0,
+      $canvasElement.$canvas.width,
+      $canvasElement.$canvas.height
+    );
   }
 }
