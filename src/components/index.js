@@ -5,3 +5,5 @@ export * from './NotificationElement';
 export * from './TabManager';
 export * from './TabContent';
 export * from './TabButton';
+export * from './CanvasElement';
+export * from './RecordElement';
