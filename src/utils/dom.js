@@ -1,9 +1,18 @@
-import { TabContent, TabManager, TaskElement } from '../components';
-import { CanvasElement, RecordElement } from '../components/';
+import {
+  CanvasElement,
+  RecordElement,
+  TabContent,
+  TabManager,
+  TaskElement,
+} from '../components';
 import { TAB_MANAGER_CONTENT } from '../consts';
-import { addEventsDragStartDragEnd } from './drag-drop';
-import { createMap, editContentToMap } from './map';
-import { loadBlobFromLocalStorage, saveBlobToLocalStorage } from './convert';
+import {
+  addEventsDragStartDragEnd,
+  createMap,
+  editContentToMap,
+  loadBlobFromLocalStorage,
+  saveBlobToLocalStorage,
+} from './index';
 
 export function createTasks(tasks, target) {
   if (Array.isArray(tasks) && tasks.length > 0)
