@@ -7,6 +7,11 @@ import {
 } from '../components';
 import { TAB_MANAGER_CONTENT } from '../consts';
 import {
+  createCopyButton,
+  createInputField,
+  createTextArea,
+} from './dom/create-element';
+import {
   addEventsDragStartDragEnd,
   createMap,
   editContentToMap,
@@ -57,11 +62,12 @@ export function addContentToDetails(details) {
     'gap-1',
     'items-center'
   );
-  const $titleInput = document.createElement('input');
-  $titleInput.type = 'text';
-  $titleInput.id = 'title';
-  $titleInput.name = 'title';
-  $titleInput.placeholder = 'Título de la tarea';
+
+  const $titleInput = createInputField({
+    id: 'title',
+    name: 'title',
+    placeholder: 'Título de la tarea',
+  });
   $titleInput.classList.add(
     'flex',
     'h-10',
@@ -91,9 +97,7 @@ export function addContentToDetails(details) {
   $titleFieldContainer.appendChild($titleInput);
 
   // Botón para copiar el título
-  const $titleCopyButton = document.createElement('button');
-  $titleCopyButton.type = 'button';
-  $titleCopyButton.textContent = 'Copiar';
+  const $titleCopyButton = createCopyButton('Copiar', $titleInput);
   $titleCopyButton.classList.add(
     'btn',
     'btn-copy',
@@ -105,16 +109,7 @@ export function addContentToDetails(details) {
     'text-white',
     'hover:bg-blue-600'
   );
-  $titleCopyButton.addEventListener('click', () => {
-    navigator.clipboard
-      .writeText($titleInput.value)
-      .then(() => {
-        console.log('Título copiado al portapapeles');
-      })
-      .catch((err) => {
-        console.error('Error al copiar al portapapeles: ', err);
-      });
-  });
+
   $titleFieldContainer.appendChild($titleCopyButton);
 
   const $descriptionFieldContainer = document.createElement('div');
@@ -124,10 +119,13 @@ export function addContentToDetails(details) {
     'gap-1',
     'items-center'
   );
-  const $descriptionTextarea = document.createElement('textarea');
-  $descriptionTextarea.id = 'description';
-  $descriptionTextarea.name = 'description';
-  $descriptionTextarea.placeholder = 'Descripción de la tarea';
+
+  const $descriptionTextarea = createTextArea({
+    id: 'description',
+    name: 'description',
+    placeholder: 'Descripción de la tarea',
+  });
+
   $descriptionTextarea.classList.add(
     'flex',
     'min-h-[80px]',
@@ -151,9 +149,10 @@ export function addContentToDetails(details) {
   );
   $descriptionFieldContainer.appendChild($descriptionTextarea);
 
-  const $descriptionCopyButton = document.createElement('button');
-  $descriptionCopyButton.type = 'button';
-  $descriptionCopyButton.textContent = 'Copiar';
+  const $descriptionCopyButton = createCopyButton(
+    'Copiar',
+    $descriptionTextarea
+  );
   $descriptionCopyButton.classList.add(
     'btn',
     'btn-copy',
@@ -165,16 +164,7 @@ export function addContentToDetails(details) {
     'text-white',
     'hover:bg-blue-600'
   );
-  $descriptionCopyButton.addEventListener('click', () => {
-    navigator.clipboard
-      .writeText($descriptionTextarea.value)
-      .then(() => {
-        console.log('Descripción copiada al portapapeles');
-      })
-      .catch((err) => {
-        console.error('Error al copiar al portapapeles: ', err);
-      });
-  });
+
   $descriptionFieldContainer.appendChild($descriptionCopyButton);
 
   const $dueDateFieldContainer = document.createElement('div');
@@ -190,9 +180,8 @@ export function addContentToDetails(details) {
   $dueDateInput.name = 'due-date';
   $dueDateFieldContainer.appendChild($dueDateInput);
 
-  const $dueDateCopyButton = document.createElement('button');
-  $dueDateCopyButton.type = 'button';
-  $dueDateCopyButton.textContent = 'Copiar';
+  const $dueDateCopyButton = createCopyButton('Copiar', $dueDateInput);
+
   $dueDateCopyButton.classList.add(
     'btn',
     'btn-copy',
@@ -204,16 +193,7 @@ export function addContentToDetails(details) {
     'text-white',
     'hover:bg-blue-600'
   );
-  $dueDateCopyButton.addEventListener('click', () => {
-    navigator.clipboard
-      .writeText($dueDateInput.value)
-      .then(() => {
-        console.log('Fecha de vencimiento copiada al portapapeles');
-      })
-      .catch((err) => {
-        console.error('Error al copiar al portapapeles: ', err);
-      });
-  });
+
   $dueDateFieldContainer.appendChild($dueDateCopyButton);
 
   const $audioContainer = document.createElement('div');
