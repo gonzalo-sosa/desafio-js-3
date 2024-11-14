@@ -42,6 +42,7 @@ export function addContentToDetails(details) {
 
   const $titleFieldContainer = document.createElement('div');
   $titleFieldContainer.classList.add(
+    'max-w-80%',
     'flex',
     'flex-row',
     'gap-1',
@@ -56,6 +57,7 @@ export function addContentToDetails(details) {
     'flex',
     'h-10',
     'w-full',
+    'max-w-[80%]',
     'rounded-md',
     'border',
     'border-input',
@@ -121,6 +123,7 @@ export function addContentToDetails(details) {
     'flex',
     'min-h-[80px]',
     'w-full',
+    'max-w-[80%]',
     'rounded-md',
     'border',
     'border-input',
@@ -417,6 +420,22 @@ function editContentToCanvas($canvas, $taskElement) {
 
   $canvasElement.id = id;
 
+  // Limpiar canvas antes de cargar imagen
+  let context = $canvasElement.context;
+  context.fillStyle = '#fff';
+  context.fillRect(
+    0,
+    0,
+    $canvasElement.$canvas.width,
+    $canvasElement.$canvas.height
+  );
+  context.clearRect(
+    0,
+    0,
+    $canvasElement.$canvas.width,
+    $canvasElement.$canvas.height
+  );
+
   if (canvasData) {
     let img = new Image();
     img.onload = function () {
@@ -425,20 +444,5 @@ function editContentToCanvas($canvas, $taskElement) {
     };
 
     img.src = canvasData;
-  } else {
-    let context = $canvasElement.context;
-    context.fillStyle = '#fff';
-    context.fillRect(
-      0,
-      0,
-      $canvasElement.$canvas.width,
-      $canvasElement.$canvas.height
-    );
-    context.clearRect(
-      0,
-      0,
-      $canvasElement.$canvas.width,
-      $canvasElement.$canvas.height
-    );
   }
 }
