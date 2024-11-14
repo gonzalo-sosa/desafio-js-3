@@ -224,66 +224,22 @@ addContentToDetails($details);
 addContentToMap($map);
 addContentToCanvas($canvas);
 
-const $canvasElement = document.querySelector('canvas');
-const context = $canvasElement.getContext('2d');
-
-let initialX;
-let initialY;
-
-const dibujar = (x, y) => {
-  context.beginPath();
-  context.moveTo(initialX, initialY);
-  context.lineWidth = 5;
-  context.strokeStyle = '#000';
-  context.lineCap = 'round';
-  context.lineJoin = 'round';
-  context.lineTo(x, y);
-  context.stroke();
-
-  initialX = x;
-  initialY = y;
-};
-
-const mouseDown = (event) => {
-  initialX = event.offsetX;
-  initialY = event.offsetY;
-  dibujar(initialX, initialY);
-  $canvasElement.addEventListener('mousemove', mouseMoving);
-};
-
-const mouseMoving = (event) => {
-  dibujar(event.offsetX, event.offsetY);
-};
-
-const mouseUp = () => {
-  $canvasElement.removeEventListener('mousemove', mouseMoving);
-};
-
-$canvasElement.addEventListener('mousedown', mouseDown);
-$canvasElement.addEventListener('mouse', mouseUp);
-
+/*
+CREAR CANVAS
+*/
 const $clearCanvas = document.getElementById('clear-canvas');
 const $saveCanvas = document.getElementById('save-canvas');
 
-$clearCanvas.addEventListener('click', handleClearCanvas);
-$saveCanvas.addEventListener('click', handleSaveCanvas);
+const $canvasElement = document.querySelector('canvas-element');
 
-function handleClearCanvas() {
-  const $canvas = document.querySelector('canvas');
-  const context = $canvas.getContext('2d');
+$canvasElement.onSave = (id, imageData) => {
+  LocalStorage.save(`${id}-canvas`, imageData);
+};
 
-  context.fillStyle = '#fff';
-  context.fillRect(0, 0, $canvas.width, $canvas.height);
-  context.clearRect(0, 0, $canvas.width, $canvas.height);
-}
-
-function handleSaveCanvas() {
-  const $canvas = document.querySelector('canvas');
-  const imageData = $canvas.toDataURL('image/png');
-  const $tabManager = document.querySelector('tab-manager');
-  const taskId = $tabManager.getAttribute('task-id');
-  LocalStorage.save(`${taskId}-canvas`, imageData);
-}
+$clearCanvas.addEventListener('click', () =>
+  $canvasElement.handleClearCanvas()
+);
+$saveCanvas.addEventListener('click', () => $canvasElement.handleSaveCanvas());
 
 // a cada tarea le agrego los eventos de dragstart y drag end
 
