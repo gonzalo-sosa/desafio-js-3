@@ -39,15 +39,23 @@ worker.onmessage = (e) => {
   if (data) {
     const task = data.task;
 
+    // Buscar si esta tarea ya existe
+    // Si ya existe no agregarla
+
+    console.log(task);
+
     switch (task._state) {
       case STATES.NEW:
-        addTaskElementToListElement(task, $taskListNew);
+        if (!newTaskList.getTaskById(task._id))
+          addTaskElementToListElement(task, $taskListNew);
         break;
       case STATES.IN_PROGRESS:
-        addTaskElementToListElement(task, $taskListInProgress);
+        if (!inProgressTaskList.getTaskById(task._id))
+          addTaskElementToListElement(task, $taskListInProgress);
         break;
       case STATES.COMPLETED:
-        addTaskElementToListElement(task, $taskListCompleted);
+        if (!completedTaskList.getTaskById(task._id))
+          addTaskElementToListElement(task, $taskListCompleted);
         break;
       default:
         console.log('Estado de tarea desconocido', task._state);
@@ -241,27 +249,26 @@ $clearCanvas.addEventListener('click', () =>
 );
 $saveCanvas.addEventListener('click', () => $canvasElement.handleSaveCanvas());
 
-// a cada tarea le agrego los eventos de dragstart y drag end
-
+// A cada tarea le agrego los eventos de dragstart y drag end
 const $taskElements = document.querySelectorAll('task-element');
 
 $taskElements.forEach(($task) => {
   addEventsDragStartDragEnd($task);
 });
 
-// para cada lista de tareas escucho el evento drop
+// Para cada lista de tareas escucho el evento drop
 
 $taskListNew.addEventListener('drop', handleDropTask);
 $taskListInProgress.addEventListener('drop', handleDropTask);
 $taskListCompleted.addEventListener('drop', handleDropTask);
 
-// para cada lista de tareas escucho el evento de dragover
+// Para cada lista de tareas escucho el evento de dragover
 
 $taskListNew.addEventListener('dragover', handleDragOverTask);
 $taskListInProgress.addEventListener('dragover', handleDragOverTask);
 $taskListCompleted.addEventListener('dragover', handleDragOverTask);
 
-// para cada lista de tareas escucho el evento dragleave
+// Para cada lista de tareas escucho el evento dragleave
 
 $taskListNew.addEventListener('dragleave', handleDragLeaveTask);
 $taskListInProgress.addEventListener('dragleave', handleDragLeaveTask);
