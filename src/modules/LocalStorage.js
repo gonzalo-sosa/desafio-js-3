@@ -10,6 +10,7 @@ export class LocalStorage extends Storage {
     localStorage.setItem(key, value);
   }
   /**
+   * Busca una key en formato JSON el local storage y la retorna en formato objeto
    * @param {string} key
    * @param {string} defaultValue
    */
