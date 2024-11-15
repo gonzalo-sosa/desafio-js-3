@@ -1,6 +1,6 @@
-import { TabContentEditor } from './TabContentEditor';
+import { ContentEditor } from './ContentEditor';
 
-export class DetailsEditor extends TabContentEditor {
+export class DetailsEditor extends ContentEditor {
   editContent($tabContent, $taskElement) {
     const $details = $tabContent;
     const $title = $details.querySelector('[name=title]');

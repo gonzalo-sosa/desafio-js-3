@@ -1,6 +1,6 @@
-import { TabContentEditor } from './TabContentEditor';
+import { ContentEditor } from './ContentEditor';
 
-export class CanvasEditor extends TabContentEditor {
+export class CanvasEditor extends ContentEditor {
   editContent($tabContent, $taskElement) {
     const $canvas = $tabContent;
     const $canvasElement = $canvas.querySelector('canvas-element');
@@ -27,6 +27,7 @@ export class CanvasEditor extends TabContentEditor {
 
     if (canvasData) {
       let img = new Image();
+
       img.onload = function () {
         let context = $canvasElement.context;
         context.drawImage(img, 0, 0);
