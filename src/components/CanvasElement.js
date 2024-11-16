@@ -23,7 +23,7 @@ export class CanvasElement extends HTMLElement {
     this.context = this.$canvas.getContext('2d');
   }
 
-  dibujar(dx, dy) {
+  draw(dx, dy) {
     this.context.beginPath();
     this.context.moveTo(this.initialX, this.initialY);
     this.context.lineWidth = 5;
@@ -40,7 +40,7 @@ export class CanvasElement extends HTMLElement {
   mouseDown(event) {
     this.initialX = event.offsetX;
     this.initialY = event.offsetY;
-    this.dibujar(this.initialX, this.initialY);
+    this.draw(this.initialX, this.initialY);
 
     this.$canvas.addEventListener('mousemove', (event) =>
       this.mouseMoving(event)
@@ -48,7 +48,7 @@ export class CanvasElement extends HTMLElement {
   }
 
   mouseMoving(event) {
-    this.dibujar(event.offsetX, event.offsetY);
+    this.draw(event.offsetX, event.offsetY);
   }
 
   mouseUp() {
@@ -66,7 +66,7 @@ export class CanvasElement extends HTMLElement {
     this.$canvas.addEventListener('mousedown', (event) =>
       this.mouseDown(event)
     );
-    this.$canvas.addEventListener('mouse', () => this.mouseUp());
+    this.$canvas.addEventListener('mouseup', () => this.mouseUp());
   }
 
   setCanvasSize() {
@@ -89,7 +89,7 @@ export class CanvasElement extends HTMLElement {
 
   handleSaveCanvas() {
     const imageData = this.$canvas.toDataURL('image/png');
-    this.onSave(this.id, imageData);
+    if (this.onSave) this.onSave(this.id, imageData);
   }
 }
 
