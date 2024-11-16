@@ -42,8 +42,6 @@ worker.onmessage = (e) => {
     // Buscar si esta tarea ya existe
     // Si ya existe no agregarla
 
-    console.log(task);
-
     switch (task._state) {
       case STATES.NEW:
         if (!newTaskList.getTaskById(task._id))
