@@ -3,6 +3,10 @@ export class RecordElement extends HTMLElement {
     return ['src'];
   }
 
+  static get name() {
+    return 'record-element';
+  }
+
   constructor(onLoad, onStop) {
     super();
     this.onLoad = onLoad;
@@ -10,7 +14,7 @@ export class RecordElement extends HTMLElement {
     this.mediaRecorder;
     this.recordedChunks = [];
 
-    this.innerHTML = `<div><button id="startBtn" class="btn btn-record text-xs py-1 px-2 rounded-md bg-green-500 text-white hover:bg-green-600" type="button">Grabar</button><button id="stopBtn" class="btn btn-record text-xs py-1 px-2 rounded-md bg-red-500 text-white hover:bg-red-600" type="button">Detener</button><audio controls id="audioPlayback"></audio></div>`;
+    this.innerHTML = /*html*/ `<div><button id="startBtn" class="btn btn-record text-xs py-1 px-2 rounded-md bg-green-500 text-white hover:bg-green-600" type="button">Grabar</button><button id="stopBtn" class="btn btn-record text-xs py-1 px-2 rounded-md bg-red-500 text-white hover:bg-red-600" type="button">Detener</button><audio controls id="audioPlayback"></audio></div>`;
 
     this.$startBtn = this.querySelector('#startBtn');
     this.$stopBtn = this.querySelector('#stopBtn');
@@ -63,4 +67,4 @@ export class RecordElement extends HTMLElement {
   }
 }
 
-customElements.define('record-element', RecordElement);
+customElements.define(RecordElement.name, RecordElement);

@@ -15,7 +15,7 @@ export class CanvasElement extends HTMLElement {
       'justify-center',
       'gap-4'
     );
-    this.innerHTML = `<div class="w-full h-64 bg-white border-2 border-dashed border-gray-300 flex items-center justify-center">
+    this.innerHTML = /*html*/ `<div class="w-full h-64 bg-white border-2 border-dashed border-gray-300 flex items-center justify-center">
         <canvas></canvas>
     </div>`;
 

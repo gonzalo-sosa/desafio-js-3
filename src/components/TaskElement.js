@@ -7,6 +7,10 @@ export class TaskElement extends HTMLElement {
     return ['state'];
   }
 
+  static get name() {
+    return 'task-element';
+  }
+
   constructor(id, title, description, dueDate, location, state) {
     super();
     this.attachShadow({ mode: 'open' });
@@ -35,10 +39,8 @@ export class TaskElement extends HTMLElement {
     this.bindEvents();
   }
 
-  render() {
-    this.shadowRoot.innerHTML = `
-      <style>
-        .task{
+  static get styles() {
+    return /*css*/ `.task{
           padding: .35rem;
           display: flex;
           flex-direction: row;
@@ -90,7 +92,13 @@ export class TaskElement extends HTMLElement {
         .state-list button state-icon-element{
           font-size: 10px;
           margin-right: 10px;
-        }
+        }`;
+  }
+
+  render() {
+    this.shadowRoot.innerHTML = /*html*/ `
+      <style>
+        ${TaskElement.styles}
       </style>
       <article class="task">
         <button class="task__btn"><popover-element open="false"></popover-element></button>
@@ -194,4 +202,4 @@ export class TaskElement extends HTMLElement {
   }
 }
 
-customElements.define('task-element', TaskElement);
+customElements.define(TaskElement.name, TaskElement);
