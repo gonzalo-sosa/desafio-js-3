@@ -1,3 +1,5 @@
+import { ValidatorTask } from '../utils';
+
 let ws;
 let messageQueue = [];
 
@@ -33,6 +35,10 @@ function connectWebSocket() {
     let data;
     try {
       data = JSON.parse(e.data);
+
+      // VALIDAR SI ES TASK
+      if (!ValidatorTask.isTasK(data))
+        throw new Error('No es una tarea válida.');
     } catch (error) {
       console.error('Error al procesar los datos recibidos:', error);
       return;

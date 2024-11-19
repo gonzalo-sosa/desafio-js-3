@@ -16,6 +16,7 @@ import {
   handleDragLeaveTask,
   handleDragOverTask,
   handleDropTask,
+  ValidatorTask,
 } from './utils/index';
 
 // Traer las tareas del local storage
@@ -38,6 +39,9 @@ worker.onmessage = (e) => {
 
   if (data) {
     const task = data.task;
+
+    // Validar si es una tarea
+    if (!ValidatorTask.isTasK(task)) throw new Error('Tarea inválida.');
 
     // Buscar si esta tarea ya existe
     // Si ya existe no agregarla
