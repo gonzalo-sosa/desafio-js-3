@@ -5,20 +5,21 @@ export class CanvasElement extends HTMLElement {
     this.onSave = onSave;
     this.initialX = 0;
     this.initialY = 0;
+    this.mouseMoveHandler = this.mouseMoving.bind(this);
 
     this.classList.add(
       'w-full',
-      'h-64',
-      'bg-white',
-      'border-2',
-      'border-dashed',
-      'border-gray-300',
       'flex',
+      'flex-col',
       'items-center',
-      'justify-center'
+      'justify-center',
+      'gap-4'
     );
-    this.innerHTML = `<canvas></canvas>`;
+    this.innerHTML = `<div class="w-full h-64 bg-white border-2 border-dashed border-gray-300 flex items-center justify-center">
+        <canvas></canvas>
+    </div>`;
 
+    this.$container = this.querySelector('div');
     this.$canvas = this.querySelector('canvas');
     this.context = this.$canvas.getContext('2d');
   }
@@ -42,9 +43,7 @@ export class CanvasElement extends HTMLElement {
     this.initialY = event.offsetY;
     this.draw(this.initialX, this.initialY);
 
-    this.$canvas.addEventListener('mousemove', (event) =>
-      this.mouseMoving(event)
-    );
+    this.$canvas.addEventListener('mousemove', this.mouseMoveHandler);
   }
 
   mouseMoving(event) {
@@ -52,7 +51,7 @@ export class CanvasElement extends HTMLElement {
   }
 
   mouseUp() {
-    this.$canvas.removeEventListener('mousemove', () => this.mouseMoving());
+    this.$canvas.removeEventListener('mousemove', this.mouseMoveHandler);
   }
 
   connectedCallback() {
@@ -70,13 +69,11 @@ export class CanvasElement extends HTMLElement {
   }
 
   setCanvasSize() {
-    const elementWidth = this.offsetWidth;
-    const elementHeight = this.offsetHeight;
+    const elementWidth = this.$container.offsetWidth;
+    const elementHeight = this.$container.offsetHeight;
 
-    if (!this.$canvas.width || !this.$canvas.height) {
-      this.$canvas.width = elementWidth;
-      this.$canvas.height = elementHeight;
-    }
+    this.$canvas.width = elementWidth - 24; // Se resta el tamaño del borde
+    this.$canvas.height = elementHeight - 8; // Se resta el tamaño del borde
   }
 
   handleClearCanvas() {

@@ -6,8 +6,7 @@ import {
   TaskElement,
 } from '../components';
 import { TAB_MANAGER_CONTENT } from '../consts';
-import { CanvasEditor, DetailsEditor } from '../modules/index';
-import { MapEditor } from '../modules/MapEditor';
+import { CanvasEditor, DetailsEditor, MapEditor } from '../modules/index';
 import {
   createAudioField,
   createButton,
