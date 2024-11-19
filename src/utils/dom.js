@@ -1,11 +1,13 @@
 import {
   CanvasElement,
+  MapElement,
   TabContent,
   TabManager,
   TaskElement,
 } from '../components';
 import { TAB_MANAGER_CONTENT } from '../consts';
 import { CanvasEditor, DetailsEditor } from '../modules/index';
+import { MapEditor } from '../modules/MapEditor';
 import {
   createAudioField,
   createButton,
@@ -13,11 +15,7 @@ import {
   createDueDateField,
   createTitleField,
 } from './dom/create-element';
-import {
-  addEventsDragStartDragEnd,
-  createMap,
-  editContentToMap,
-} from './index';
+import { addEventsDragStartDragEnd } from './index';
 
 export function createTasks(tasks, target) {
   if (Array.isArray(tasks) && tasks.length > 0)
@@ -70,31 +68,13 @@ export function addContentToDetails(details) {
 }
 
 export function addContentToMap(map) {
-  const $mapContainer = document.createElement('div');
-  $mapContainer.classList.add(
-    'w-full',
-    'h-64',
-    'md:h-96',
-    'bg-gray-300',
-    'flex',
-    'items-center',
-    'justify-center'
-  );
+  const $mapElement = new MapElement({
+    latitude: -34.61315,
+    longitude: -58.67723,
+    initialZoom: 13,
+  });
 
-  const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin h-8 w-8 text-gray-500" data-id="49"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
-
-  const mapText = document.createElement('span');
-  mapText.classList.add('ml-2');
-  mapText.textContent = 'Mapa se mostrará aquí';
-
-  $mapContainer.innerHTML = icon;
-  $mapContainer.appendChild(mapText);
-
-  window.LMap = createMap($mapContainer);
-
-  map.target.appendChild($mapContainer);
-
-  window.LMap.invalidateSize();
+  map.target.appendChild($mapElement);
 }
 
 export function addContentToCanvas(canvas) {
@@ -217,13 +197,14 @@ function addEventChangeTabManagerContent(task) {
   task.addEventListener('click', (event) => changeTabManagerContent(event));
 }
 
-export function updateTaskContentInTab($taskElement, $details, $canvas) {
+export function updateTaskContentInTab($taskElement, $details, $canvas, $map) {
   const detailsEditor = new DetailsEditor();
   const canvasEditor = new CanvasEditor();
+  const mapEditor = new MapEditor();
 
   detailsEditor.editContent($details, $taskElement);
   canvasEditor.editContent($canvas, $taskElement);
-  editContentToMap($taskElement);
+  mapEditor.editContent($map, $taskElement);
 }
 
 export function changeTabManagerContent(event) {
@@ -233,10 +214,11 @@ export function changeTabManagerContent(event) {
   const $tabManager = document.querySelector('tab-manager');
   const $details = document.querySelector('[tab-content-name=details]');
   const $canvas = document.querySelector('[tab-content-name=canvas]');
+  const $map = document.querySelector('[tab-content-name=map]');
 
   $tabManager.setAttribute('task-id', id);
 
   if ($taskElement) {
-    updateTaskContentInTab($taskElement, $details, $canvas);
+    updateTaskContentInTab($taskElement, $details, $canvas, $map);
   }
 }
