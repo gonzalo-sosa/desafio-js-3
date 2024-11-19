@@ -18,7 +18,6 @@ export function getFormData(event) {
   )
     throw new Error('El título no es válido');
 
-  console.log(description, description.length);
   if (
     !ValidatorString.isAlphanumeric(description) ||
     ValidatorString.isValueLong(description.length)
